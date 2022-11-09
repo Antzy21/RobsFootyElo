@@ -1,5 +1,6 @@
 # imports csv module into this Python script (csv module part of Python's standard library - so you will have it if you have Python)
 import csv
+import time
 
 # This is a function for caculating new elo scores based on current elo and the match result
 # This can be modified to allow for a "thrashing" boost to the elo score changes, based on whatever model we would like to try!
@@ -36,7 +37,8 @@ def calculateMatches(csvs, eloOutputFile, headersSet = False):
     teamsAndElos = {'Chelsea': [startingElo, {}]}
     # A track of all the dates matches are played on
     allDates = []
-    
+    print("Running Calculations")
+    time.sleep(1)
     lowestElo = startingElo
     for csv in csvs:
         # for each row in the csv, and it's row number i.
@@ -78,6 +80,8 @@ def calculateMatches(csvs, eloOutputFile, headersSet = False):
      
     # Now we have run all the data through the elo calculators
     # Time to print out our results to an output csv 
+    print("Writing to output.csv")
+    time.sleep(1)
     
     # Print header - "Date" and all the team names
     eloOutputFile.write('Dates, '+ ', '.join([team for team in teamsAndElos])+'\n')
@@ -92,11 +96,14 @@ def calculateMatches(csvs, eloOutputFile, headersSet = False):
                 line += ","
         eloOutputFile.write(line+'\n')
     
-          
 startingElo = 1000
 weightK = 32
 csv_16_17 = "16_17Season.csv"
 csv_17_18 = "17_18Season.csv"
+
+print("Starting Elo:",startingElo)
+print("Weight:", weightK)
+time.sleep(1)
 
 with open(csv_16_17, newline='') as csvfile_16_17:
     csvreader_16_17 = csv.reader(csvfile_16_17, delimiter=',')    
@@ -105,3 +112,5 @@ with open(csv_16_17, newline='') as csvfile_16_17:
         with open ('output.csv', "w") as outputFile:
             csvList = [csvreader_16_17, csvreader_17_18]
             calculateMatches(csvList, outputFile)
+            
+input("Press any key to exit")
