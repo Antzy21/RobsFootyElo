@@ -100,17 +100,30 @@ startingElo = 1000
 weightK = 32
 csv_16_17 = "16_17Season.csv"
 csv_17_18 = "17_18Season.csv"
+csv_18_19 = "18_19Season.csv"
 
 print("Starting Elo:",startingElo)
 print("Weight:", weightK)
 time.sleep(1)
 
-with open(csv_16_17, newline='') as csvfile_16_17:
-    csvreader_16_17 = csv.reader(csvfile_16_17, delimiter=',')    
-    with open(csv_17_18, newline='') as csvfile_17_18:
-        csvreader_17_18 = csv.reader(csvfile_17_18, delimiter=',')
+csvList = [
+    csv_18_19,
+    csv_17_18,
+    csv_16_17,
+]
+
+def recursiveCsvOpening(csvList = [], csvReaders = []):
+    if len(csvList) == 0:
         with open ('output.csv', "w") as outputFile:
-            csvList = [csvreader_16_17, csvreader_17_18]
-            calculateMatches(csvList, outputFile)
+            calculateMatches(csvReaders, outputFile)
+    else:
+        print("Opening csv:", csvList[-1])
+        with open(csvList[-1], newline='') as csvfile:
+            csvReader = csv.reader(csvfile, delimiter=',')
+            csvReaders.append(csvReader)
+            csvList.pop()
+            recursiveCsvOpening(csvList, csvReaders)
+
+recursiveCsvOpening(csvList, [])
             
 input("Press any key to exit")
