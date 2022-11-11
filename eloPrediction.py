@@ -1,17 +1,19 @@
 import sys
+import math
 
-def eloPrediction(homeElo, awayElo):
+def eloPrediction(homeElo, awayElo, powerBase = math.e):
     
     homeAdvantage = 0.169
     footballSeasonalAdjustment = 0.252
     
     eloDif = homeElo - awayElo
     
-    H = 1 - (1/(1+10**(eloDif/400+homeAdvantage-footballSeasonalAdjustment)))
-    A = (1/(1+10**(eloDif/400+homeAdvantage+footballSeasonalAdjustment)))
+    print("\nBase is:", powerBase,"\n")
+    
+    H = 1 - (1/(1+powerBase**(eloDif/400+homeAdvantage-footballSeasonalAdjustment)))
+    A = (1/(1+powerBase**(eloDif/400+homeAdvantage+footballSeasonalAdjustment)))
     D = 1 - (H + A)
     
-    print("total:", D+H+A)
     
     # Returns (W, D, L) probability
     print("Home:",H)
@@ -28,5 +30,13 @@ try:
 except:
     t2 = int(input("Please provide elo for away team"))
 
-print("home:",t1,"away:", t2)
-eloPrediction(t1, t2)
+print("Home:",t1,"Away:", t2)
+
+if len(sys.argv) == 4:
+    try:
+        powerBase = int(sys.argv[3])
+        eloPrediction(t1, t2, powerBase)
+    except:
+        print("Error passing powerbase")
+else:
+    eloPrediction(t1, t2)
