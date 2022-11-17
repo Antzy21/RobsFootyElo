@@ -1,12 +1,14 @@
 # imports csv module into this Python script (csv module part of Python's standard library - so you will have it if you have Python)
 import csv
+from datetime import datetime
 import time
+import eloCalcultions
 
 # This is a function for caculating new elo scores based on current elo and the match result
 # This can be modified to allow for a "thrashing" boost to the elo score changes, based on whatever model we would like to try!
 # Inputs are t1, t2 (elo scores), match result (goals), K value
 # Outputs the two new elo scores respectively.
-def eloCalculation(t1, t2, result, weightK):
+def eloCalculation(t1, t2, result : tuple[int, int], weightK=32):
     # Step 1
     T1 = 10 ** (t1/400)
     T2 = 10 ** (t2/400)
@@ -31,99 +33,152 @@ def eloCalculation(t1, t2, result, weightK):
     t2_ = round(t2 + weightK * (S2 - E2))
     
     return(t1_, t2_)
-    
-def calculateMatches(csvs, eloOutputFile, headersSet = False):
-    # A dictionary of teams, each with values that are their current Elo, and a dictionary their elos in the past
-    teamsAndElos = {'Chelsea': [startingElo, {}]}
-    # A track of all the dates matches are played on
-    allDates = []
+
+class Team:
+    def __init__(self, name) -> None:
+        self.name = name
+        self.elo = None
+        self.matchesPlayed = 0
+    def updateElo(self, elo):
+        self.elo = elo
+        self.matchesPlayed += 1
+
+class Game:
+    def __init__(self, season, date, home, away, score) -> None:
+        self.season = season
+        self.date = date
+        self.home : Team = home
+        self.away : Team = away
+        self.score : tuple[int, int] = score
+        self.homeEloBefore = None
+        self.homeEloAfter = None
+        self.awayEloBefore = None
+        self.awayEloAfter = None
+    def playMatch(self):
+        self.homeEloBefore = self.home.elo
+        self.awayEloBefore = self.away.elo
+        homeNew, awayNew = eloCalculation(self.home.elo, self.away.elo, self.score)
+        self.home.updateElo(homeNew)
+        self.away.updateElo(awayNew)
+        self.homeEloAfter = homeNew
+        self.awayEloAfter = awayNew
+
+class Season:
+    def __init__(self, name) -> None:
+        self.name = name
+        self.games : list[Game] = []
+    def addGame(self, game: Game):
+        self.games.append(game)
+
+def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
+    seasons : list[Season] = []
+    teams : dict[str, Team] = {}
+    for seasonCsv in csvs:
+        season = Season(seasonCsv)
+        with open(seasonCsv, newline='') as csvfile:
+            csvReader = csv.reader(csvfile, delimiter=',')
+            for i, row in enumerate(csvReader):
+                # Headers of csv, not data - so skip
+                if i == 0:
+                    pass
+                # The data leaves rows blank inbetween days of matches, which is checked here - skip
+                elif ''.join(row) == '' :
+                    pass
+                # Each row is a match - time to record it and caculate elo!
+                else:
+                    # Record date
+                    year, month, day = row[2].split("-")
+                    date = datetime(int(year), int(month), int(day))
+                    # Get teams
+                    homeTeamName = row[4]
+                    awayTeamName = row[6]
+                    
+                    if homeTeamName not in teams:
+                        teams[homeTeamName] = Team(homeTeamName)
+                    if awayTeamName not in teams:
+                        teams[awayTeamName] = Team(awayTeamName)
+                        
+                    # Gets the score as two numbers in a tuple, first is for team1's goal count, second for team 2's goal count 
+                    score = (int(row[5][0]), int(row[5][-1]))
+                    game = Game(seasonCsv, date, teams[homeTeamName], teams[awayTeamName], score)
+                    season.addGame(game)
+        seasons.append(season)
+    return (seasons, teams)
+
+def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo) -> None:
     print("Running Calculations")
     time.sleep(1)
     lowestElo = startingElo
-    for csv in csvs:
-        # for each row in the csv, and it's row number i.
-        for i, row in enumerate(csv):
-            # Headers of csv, not data - so skip
-            if i == 0:
-                pass
-            # The data leaves rows blank inbetween days of matches, which is checked here - skip
-            elif ''.join(row) == '' :
-                pass
-            # Each row is a match - time to record it and caculate elo!
-            else:
-                # Record date
-                currentDate = row[2]
-                if currentDate not in allDates:
-                    allDates.append(currentDate)
-                # Get teams
-                team1 = row[4]
-                team2 = row[6]
-                # Gets the score as two numbers in a tuple, first is for team1's goal count, second for team 2's goal count 
-                score = (int(row[5][0]), int(row[5][-1]))
-                # Add teams to our records if we haven't seen them yet
-                if team1 not in teamsAndElos:
-                    teamsAndElos[team1] = [lowestElo, {}]
-                if team2 not in teamsAndElos:
-                    teamsAndElos[team2] = [lowestElo, {}]
-                # Calculate new elos
-                team1NewElo, team2NewElo = eloCalculation(teamsAndElos[team1][0], teamsAndElos[team2][0], score, weightK)
-                # Record elos in history dictionary
-                teamsAndElos[team1][1][currentDate] = team1NewElo
-                teamsAndElos[team2][1][currentDate] = team2NewElo
-                # Update current elos
-                teamsAndElos[team1][0] = team1NewElo
-                teamsAndElos[team2][0] = team2NewElo
+    for season in seasons:
+        for game in season.games:
+            if game.home.elo is None:
+                game.home.elo = lowestElo
+            if game.away.elo is None:
+                game.away.elo = lowestElo
+            game.playMatch()
         # Gets current lowest elo score (so when new season start (new csv) new teams join with it)
-        sortedEloList = [teamsAndElos[team][0] for team in teamsAndElos]
+        sortedEloList = [teams[team].elo for team in teams]
         sortedEloList.sort()
         lowestElo = sortedEloList[0]
      
+def constructEloCsv(outputFileName: str, seasons : list[Season], teams : dict[str, Team]):
     # Now we have run all the data through the elo calculators
     # Time to print out our results to an output csv 
     print("Writing to output.csv")
     time.sleep(1)
     
-    # Print header - "Date" and all the team names
-    eloOutputFile.write('Dates, '+ ', '.join([team for team in teamsAndElos])+'\n')
-    for date in allDates:
-        line = date
-        for team in teamsAndElos:
-            historicEloRatingsForTeam = teamsAndElos[team][1]
-            try:
-                v = historicEloRatingsForTeam[date]
-                line += ","+str(v)
-            except:
-                line += ","
-        eloOutputFile.write(line+'\n')
+    dates : dict[datetime, dict[str]] = {}
+    currentDate = None
+    for season in seasons:
+        for game in season.games:
+            if currentDate is None or game.date > currentDate:
+                currentDate = game.date
+                dates[currentDate] = {}
+            dates[currentDate][game.home.name] = game.homeEloAfter
+            dates[currentDate][game.away.name] = game.awayEloAfter
+    
+    
+    with open(f'{outputFileName}.csv', "w") as outputFile:
+        
+        # Print header - "Date" and all the team names
+        line = 'Dates, '+ ', '.join([team for team in teams])+'\n'
+        outputFile.write(line)
+        print(line)
+        
+        for date in dates:
+            row = dates[date]
+            line = f"{date}"
+            for team in teams:
+                try:
+                    value = row[team]
+                except:
+                    value = 0
+                line += f", {value}"
+            print(line)           
+            line += "\n"
+            outputFile.write(line)            
     
 startingElo = 1000
-weightK = 32
+csv_15_16 = "15_16Season.csv"
 csv_16_17 = "16_17Season.csv"
 csv_17_18 = "17_18Season.csv"
 csv_18_19 = "18_19Season.csv"
 
-print("Starting Elo:",startingElo)
-print("Weight:", weightK)
+print("Starting Elo:", startingElo)
+
 time.sleep(1)
 
 csvList = [
     csv_18_19,
-    csv_17_18,
-    csv_16_17,
+    #csv_17_18,
+    #csv_16_17,
+    #csv_15_16,
 ]
 
-def recursiveCsvOpening(csvList = [], csvReaders = []):
-    if len(csvList) == 0:
-        with open ('output.csv', "w") as outputFile:
-            calculateMatches(csvReaders, outputFile)
-    else:
-        print("Opening csv:", csvList[-1])
-        with open(csvList[-1], newline='') as csvfile:
-            csvReader = csv.reader(csvfile, delimiter=',')
-            csvReaders.append(csvReader)
-            csvList.pop()
-            recursiveCsvOpening(csvList, csvReaders)
+seasons, teams = readCsvs(csvList)
 
-recursiveCsvOpening(csvList, [])
-            
+calculateElos(seasons, teams, startingElo)
+
+constructEloCsv("output", seasons, teams)
+
 input("Press any key to exit")
