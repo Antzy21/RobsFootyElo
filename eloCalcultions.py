@@ -105,7 +105,7 @@ def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
         seasons.append(season)
     return (seasons, teams)
 
-def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo) -> None:
+def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: int) -> None:
     print("Running Calculations")
     time.sleep(1)
     lowestElo = startingElo
@@ -117,9 +117,11 @@ def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo) ->
                 game.away.elo = lowestElo
             game.playMatch()
         # Gets current lowest elo score (so when new season start (new csv) new teams join with it)
-        sortedEloList = [teams[team].elo for team in teams]
-        sortedEloList.sort()
-        lowestElo = sortedEloList[0]
+        eloList = [teams[team].elo for team in teams]
+        lowestElo = 100000
+        for elo in eloList:
+            if elo is not None and elo < lowestElo:
+                lowestElo = elo
      
 def eloByDate(seasons : list[Season], teams : dict[str, Team]):
     dates : dict[datetime, dict[str]] = {}
@@ -143,8 +145,8 @@ def winProbabilityByDate(seasons : list[Season], teams : dict[str, Team]):
                 currentDate = game.date
                 dates[currentDate] = {}
             H, D, A = eloPrediction.eloPrediction(game.homeEloBefore, game.awayEloBefore)
-            dates[currentDate][game.home.name] = H
-            dates[currentDate][game.away.name] = A
+            dates[currentDate][game.home.name] = H*100
+            dates[currentDate][game.away.name] = A*100
     
     return dates
     
@@ -165,7 +167,7 @@ def constructDateCsv(outputFileName: str, datesDict: dict[datetime, dict[str]]):
             line = f"{date}"
             for team in teams:
                 try:
-                    value = row[team]
+                    value = round(row[team], 1)
                 except:
                     value = ""
                 line += f", {value}"
@@ -185,9 +187,9 @@ time.sleep(1)
 
 csvList = [
     csv_18_19,
-    #csv_17_18,
-    #csv_16_17,
-    #csv_15_16,
+    csv_17_18,
+    csv_16_17,
+    csv_15_16,
 ]
 
 seasons, teams = readCsvs(csvList)

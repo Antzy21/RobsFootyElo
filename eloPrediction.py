@@ -7,8 +7,6 @@ def eloPrediction(homeElo, awayElo, powerBase = math.e):
     
     eloDif = homeElo - awayElo
     
-    print("\nBase is:", powerBase,"\n")
-    
     H = 1 - (1/(1+powerBase**(eloDif/400+homeAdvantage-footballSeasonalAdjustment)))
     A = (1/(1+powerBase**(eloDif/400+homeAdvantage+footballSeasonalAdjustment)))
     D = 1 - (H + A)
