@@ -2,7 +2,7 @@
 import csv
 from datetime import datetime
 import time
-import eloCalcultions
+import eloPrediction
 
 # This is a function for caculating new elo scores based on current elo and the match result
 # This can be modified to allow for a "thrashing" boost to the elo score changes, based on whatever model we would like to try!
@@ -121,12 +121,7 @@ def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo) ->
         sortedEloList.sort()
         lowestElo = sortedEloList[0]
      
-def constructEloCsv(outputFileName: str, seasons : list[Season], teams : dict[str, Team]):
-    # Now we have run all the data through the elo calculators
-    # Time to print out our results to an output csv 
-    print("Writing to output.csv")
-    time.sleep(1)
-    
+def eloByDate(seasons : list[Season], teams : dict[str, Team]):
     dates : dict[datetime, dict[str]] = {}
     currentDate = None
     for season in seasons:
@@ -137,22 +132,42 @@ def constructEloCsv(outputFileName: str, seasons : list[Season], teams : dict[st
             dates[currentDate][game.home.name] = game.homeEloAfter
             dates[currentDate][game.away.name] = game.awayEloAfter
     
+    return dates
+     
+def winProbabilityByDate(seasons : list[Season], teams : dict[str, Team]):
+    dates : dict[datetime, dict[str]] = {}
+    currentDate = None
+    for season in seasons:
+        for game in season.games:
+            if currentDate is None or game.date > currentDate:
+                currentDate = game.date
+                dates[currentDate] = {}
+            H, D, A = eloPrediction.eloPrediction(game.homeEloBefore, game.awayEloBefore)
+            dates[currentDate][game.home.name] = H
+            dates[currentDate][game.away.name] = A
+    
+    return dates
+    
+def constructDateCsv(outputFileName: str, datesDict: dict[datetime, dict[str]]):
+    # Now we have run all the data through the elo calculators
+    # Time to print out our results to an output csv 
+    print(f"Writing to {outputFileName}.csv")
+    time.sleep(1)
     
     with open(f'{outputFileName}.csv', "w") as outputFile:
-        
         # Print header - "Date" and all the team names
         line = 'Dates, '+ ', '.join([team for team in teams])+'\n'
         outputFile.write(line)
         print(line)
         
-        for date in dates:
-            row = dates[date]
+        for date in datesDict:
+            row = datesDict[date]
             line = f"{date}"
             for team in teams:
                 try:
                     value = row[team]
                 except:
-                    value = 0
+                    value = ""
                 line += f", {value}"
             print(line)           
             line += "\n"
@@ -179,6 +194,10 @@ seasons, teams = readCsvs(csvList)
 
 calculateElos(seasons, teams, startingElo)
 
-constructEloCsv("output", seasons, teams)
+eloByDates = eloByDate(seasons, teams)
+constructDateCsv("EloRatings", eloByDates)
+
+winProbByDates = winProbabilityByDate(seasons, teams)
+constructDateCsv("Probabilities", winProbByDates)
 
 input("Press any key to exit")
