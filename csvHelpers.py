@@ -36,3 +36,36 @@ def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
                     season.addGame(game)
         seasons.append(season)
     return (seasons, teams)
+
+
+def constructDateCsv(
+    outputFileName: str,
+    datesDict: dict[datetime, dict[str]],
+    teams: list[Team],
+    printLine: bool = True
+    ):
+    # Now we have run all the data through the elo calculators
+    # Time to print out our results to an output csv 
+    print(f"Writing to {outputFileName}.csv")
+    
+    with open(f'{outputFileName}.csv', "w") as outputFile:
+        # Print header - "Date" and all the team names
+        line = 'Dates, '+ ', '.join([team for team in teams])+'\n'
+        outputFile.write(line)
+        if printLine:
+            print(line)
+        
+        for date in datesDict:
+            row = datesDict[date]
+            line = f"{date}"
+            for team in teams:
+                try:
+                    value = round(row[team], 1)
+                except:
+                    value = ""
+                line += f", {value}"
+            if printLine:
+                print(line)           
+            line += "\n"
+            outputFile.write(line)            
+    
