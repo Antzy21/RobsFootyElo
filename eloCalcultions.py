@@ -15,7 +15,9 @@ def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: in
                 game.home.elo = lowestElo
             if game.away.elo is None:
                 game.away.elo = lowestElo
+                
             game.playMatch()
+            
         # Gets current lowest elo score (so when new season start (new csv) new teams join with it)
         eloList = [teams[team].elo for team in teams]
         lowestElo = 100000
@@ -61,10 +63,10 @@ print("Starting Elo:", startingElo)
 time.sleep(1)
 
 csvList = [
-    csv_18_19,
-    csv_17_18,
-    csv_16_17,
     csv_15_16,
+    csv_16_17,
+    csv_17_18,
+    csv_18_19,
 ]
 
 seasons, teams = readCsvs(csvList)
