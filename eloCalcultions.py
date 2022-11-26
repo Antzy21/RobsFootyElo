@@ -6,29 +6,32 @@ from helpers.csvHelpers import *
 from helpers.classes import *
 from helpers.manipulateData import *
 
-startingElo = 1000
-print("Starting Elo:", startingElo)
-
 csvList = [
+    "12_13Season.csv",
+    "13_14Season.csv",
+    "14_15Season.csv",
     "15_16Season.csv",
     "16_17Season.csv",
     "17_18Season.csv",
     "18_19Season.csv",
 ]
 
-seasons, teams = readCsvs(csvList)
-calculateElos(seasons, teams, startingElo)
+startingElo = 1000
+print("Starting Elo:", startingElo)
 
-constructDateCsv("EloRatings", eloByDate(seasons), teams)
-constructDateCsv("Probabilities", winProbabilityByDate(seasons, teams), teams)
-constructGameCsv("EloRatingsByGame", eloByMatchWeek(seasons), teams)
-constructGameCsv("ProbabilitiesByGame", winProbByMatchWeek(seasons), teams)
-constructGameCsv("LogEvalByGame", logEvalByMatchWeek([seasons[-1]], teams), teams)
-constructGameCsv("GoalDifByGame", goalDifByMatchWeek([seasons[-1]], teams), teams)
+for k in range(10, 30):
+    seasons, teams = readCsvs(csvList)
+    calculateElos(seasons, teams, startingElo, k)
 
-logValues, logTotal = logEvaluationForSeason(seasons[-1])
+    logValues, logTotal = logEvaluationForSeason(seasons[-1])
+    #for logValue in logValues:
+        #print(logValue,": ",logValues[logValue])
+    print("k: ",k, "log: ",logTotal)
 
-for logValue in logValues:
-    print(logValue,": ",logValues[logValue])
+# constructDateCsv("EloRatings", eloByDate(seasons), teams)
+# constructDateCsv("Probabilities", winProbabilityByDate(seasons, teams), teams)
+# constructGameCsv("EloRatingsByGame", eloByMatchWeek(seasons), teams)
+# constructGameCsv("ProbabilitiesByGame", winProbByMatchWeek(seasons), teams)
+# constructGameCsv("LogEvalByGame", logEvalByMatchWeek([seasons[-1]], teams), teams)
+# constructGameCsv("GoalDifByGame", goalDifByMatchWeek([seasons[-1]], teams), teams)
 
-print(logTotal)

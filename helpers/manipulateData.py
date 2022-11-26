@@ -2,8 +2,8 @@ from helpers.classes import *
 from datetime import datetime
 from helpers import eloMath
 
-def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: int) -> None:
-    print("Running Calculations")
+def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: int, kWeight = 20) -> None:
+    #print("Running Calculations")
     lowestElo = startingElo
     for season in seasons:
         for game in season.games:
@@ -12,7 +12,7 @@ def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: in
             if game.away.elo is None:
                 game.away.elo = lowestElo
                 
-            game.playMatch()
+            game.playMatch(kWeight)
             
         # Gets current lowest elo score (so when new season start (new csv) new teams join with it)
         eloList = [teams[team].elo for team in teams]

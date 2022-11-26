@@ -23,10 +23,16 @@ class Game:
         self.homeEloAfter = None
         self.awayEloBefore = None
         self.awayEloAfter = None
-    def playMatch(self):
+    def playMatch(self, K = 20):
         self.homeEloBefore = self.home.elo
         self.awayEloBefore = self.away.elo
-        homeNew, awayNew = eloCalculation(self.home.elo, self.away.elo, self.score)
+        k = 20
+        try:
+           if self.home.matchesPlayed[self.season] < 5:
+               k = K
+        except:
+           k = K
+        homeNew, awayNew = eloCalculation(self.home.elo, self.away.elo, self.score, k)
         self.home.updateElo(homeNew, self.season)
         self.away.updateElo(awayNew, self.season)
         self.homeEloAfter = homeNew
