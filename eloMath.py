@@ -8,7 +8,7 @@ def eloCalculation(
     t1,
     t2,
     result : tuple[int, int],
-    weightK = 32
+    weightK = 20
     ):
     
     # Step 1
@@ -51,3 +51,12 @@ def eloPrediction(
     D = 1 - (H + A)
     
     return (H, D, A)
+
+def logEvaluationValue(homeElo, awayElo, matchResult: tuple[int, int]) -> int:
+    (H, D, A) = eloPrediction(homeElo, awayElo)
+    if matchResult[0] > matchResult[1]:
+        return math.log(H)
+    elif matchResult[0] < matchResult[1]:
+        return math.log(A)
+    elif matchResult[0] == matchResult[1]:
+        return math.log(D)
