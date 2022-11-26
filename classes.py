@@ -4,10 +4,13 @@ class Team:
     def __init__(self, name) -> None:
         self.name = name
         self.elo = None
-        self.matchesPlayed = 0
-    def updateElo(self, elo):
+        self.matchesPlayed: dict[int, int] = {}
+    def updateElo(self, elo, season):
         self.elo = elo
-        self.matchesPlayed += 1
+        try:
+            self.matchesPlayed[season] += 1
+        except:
+            self.matchesPlayed[season] = 0
 
 class Game:
     def __init__(self, season, date, home, away, score) -> None:
@@ -24,13 +27,15 @@ class Game:
         self.homeEloBefore = self.home.elo
         self.awayEloBefore = self.away.elo
         homeNew, awayNew = eloCalculation(self.home.elo, self.away.elo, self.score)
-        self.home.updateElo(homeNew)
-        self.away.updateElo(awayNew)
+        self.home.updateElo(homeNew, self.season)
+        self.away.updateElo(awayNew, self.season)
         self.homeEloAfter = homeNew
         self.awayEloAfter = awayNew
+        self.week = self.home.matchesPlayed[self.season]
 
 class Season:
-    def __init__(self, name) -> None:
+    def __init__(self, name, number) -> None:
+        self.number = number
         self.name = name
         self.games : list[Game] = []
     def addGame(self, game: Game):

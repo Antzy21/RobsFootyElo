@@ -5,8 +5,8 @@ import csv
 def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
     seasons : list[Season] = []
     teams : dict[str, Team] = {}
-    for seasonCsv in csvs:
-        season = Season(seasonCsv)
+    for i, seasonCsv in enumerate(csvs):
+        season = Season(seasonCsv, i)
         with open(seasonCsv, newline='') as csvfile:
             csvReader = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(csvReader):
@@ -37,6 +37,31 @@ def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
         seasons.append(season)
     return (seasons, teams)
 
+def constructGameCsv(
+    outputFileName: str,
+    seasons: list[Season],
+    teams: list[Team],
+    printLine: bool = False
+    ):
+    print(f"Writing to {outputFileName}.csv")
+    
+    with open(f'{outputFileName}.csv', "w") as outputFile:
+        line = 'Game Week, '+ ', '.join([team for team in teams])+'\n'
+        outputFile.write(line)
+        if printLine:
+            print(line)
+        for season in seasons:
+            for game in season.games:
+                line = f"{season.number}-{game.week}"
+                for team in teams:
+                    if team == game.home.name:
+                        line += f",{game.homeEloAfter}"
+                    elif team == game.away.name:
+                        line += f",{game.awayEloAfter}"
+                    else:
+                        line += ","
+                line += "\n"
+                outputFile.write(line)
 
 def constructDateCsv(
     outputFileName: str,

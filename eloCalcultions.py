@@ -79,4 +79,4 @@ constructDateCsv("EloRatings", eloByDates, teams, printLine = False)
 winProbByDates = winProbabilityByDate(seasons, teams)
 constructDateCsv("Probabilities", winProbByDates, teams, printLine = False)
 
-input("Press any key to exit")
+constructGameCsv("EloRatingsByGame", seasons, teams)
