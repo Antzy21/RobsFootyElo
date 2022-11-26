@@ -6,39 +6,14 @@ from helpers.csvHelpers import *
 from helpers.classes import *
 from helpers.manipulateData import *
 
-def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: int) -> None:
-    print("Running Calculations")
-    time.sleep(1)
-    lowestElo = startingElo
-    for season in seasons:
-        for game in season.games:
-            if game.home.elo is None:
-                game.home.elo = lowestElo
-            if game.away.elo is None:
-                game.away.elo = lowestElo
-                
-            game.playMatch()
-            
-        # Gets current lowest elo score (so when new season start (new csv) new teams join with it)
-        eloList = [teams[team].elo for team in teams]
-        lowestElo = 100000
-        for elo in eloList:
-            if elo is not None and elo < lowestElo:
-                lowestElo = elo
-    
 startingElo = 1000
-csv_15_16 = "15_16Season.csv"
-csv_16_17 = "16_17Season.csv"
-csv_17_18 = "17_18Season.csv"
-csv_18_19 = "18_19Season.csv"
-
 print("Starting Elo:", startingElo)
 
 csvList = [
-    csv_15_16,
-    csv_16_17,
-    csv_17_18,
-    csv_18_19,
+    "15_16Season.csv",
+    "16_17Season.csv",
+    "17_18Season.csv",
+    "18_19Season.csv",
 ]
 
 seasons, teams = readCsvs(csvList)
