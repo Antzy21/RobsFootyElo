@@ -48,6 +48,22 @@ def eloByMatchWeek(seasons : list[Season]) -> dict[datetime, dict[str]]:
                 weeks[week][game.away.name] = game.awayEloAfter
     return weeks
 
+def winProbByMatchWeek(seasons : list[Season]) -> dict[datetime, dict[str]]:
+    weeks : dict[str, dict[str]] = {}
+    for season in seasons:
+        for game in season.games:
+            week = f"{season.number}~{game.week}"
+            try:
+                H, D, A = eloMath.eloPrediction(game.homeEloBefore, game.awayEloBefore)
+                weeks[week][game.home.name] = H*100
+                weeks[week][game.away.name] = A*100
+            except:
+                weeks[week] = {}
+                H, D, A = eloMath.eloPrediction(game.homeEloBefore, game.awayEloBefore)
+                weeks[week][game.home.name] = H*100
+                weeks[week][game.away.name] = A*100
+    return weeks
+
 def logEvaluationForSeason(season : Season) -> tuple[dict[str, int], int]:
     weeks : dict[str, int] = {}
     total = 0
@@ -61,6 +77,36 @@ def logEvaluationForSeason(season : Season) -> tuple[dict[str, int], int]:
             except:
                 weeks[week] = logValue
     return weeks, total
+
+def logEvalByMatchWeek(seasons : list[Season], teams : dict[str, Team]) -> dict[str, int]:
+    weeks : dict[str, dict[str]] = {}
+    for season in seasons:
+        for game in season.games:
+            week = f"{season.number}~{game.week}"
+            logValue = eloMath.logEvaluationValue(game.homeEloAfter, game.awayEloAfter, game.score)
+            try:
+                weeks[week][game.home.name] = logValue
+                weeks[week][game.away.name] = logValue
+            except:
+                weeks[week] = {}
+                weeks[week][game.home.name] = logValue
+                weeks[week][game.away.name] = logValue
+    return weeks
+
+def goalDifByMatchWeek(seasons : list[Season], teams : dict[str, Team]) -> dict[str, int]:
+    weeks : dict[str, dict[str]] = {}
+    for season in seasons:
+        for game in season.games:
+            week = f"{season.number}~{game.week}"
+            value = game.score[0]-game.score[1]
+            try:
+                weeks[week][game.home.name] = value
+                weeks[week][game.away.name] = -value
+            except:
+                weeks[week] = {}
+                weeks[week][game.home.name] = value
+                weeks[week][game.away.name] = -value
+    return weeks
      
 def winProbabilityByDate(seasons : list[Season], teams : dict[str, Team]):
     dates : dict[datetime, dict[str]] = {}

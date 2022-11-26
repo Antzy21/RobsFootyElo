@@ -19,12 +19,12 @@ csvList = [
 seasons, teams = readCsvs(csvList)
 calculateElos(seasons, teams, startingElo)
 
-eloByDates = eloByDate(seasons)
-constructDateCsv("EloRatings", eloByDates, teams, printLine = False)
-winProbByDates = winProbabilityByDate(seasons, teams)
-constructDateCsv("Probabilities", winProbByDates, teams, printLine = False)
-eloByMatchWeeks = eloByMatchWeek(seasons)
-constructGameCsv("EloRatingsByGame", eloByMatchWeeks, teams)
+constructDateCsv("EloRatings", eloByDate(seasons), teams)
+constructDateCsv("Probabilities", winProbabilityByDate(seasons, teams), teams)
+constructGameCsv("EloRatingsByGame", eloByMatchWeek(seasons), teams)
+constructGameCsv("ProbabilitiesByGame", winProbByMatchWeek(seasons), teams)
+constructGameCsv("LogEvalByGame", logEvalByMatchWeek([seasons[-1]], teams), teams)
+constructGameCsv("GoalDifByGame", goalDifByMatchWeek([seasons[-1]], teams), teams)
 
 logValues, logTotal = logEvaluationForSeason(seasons[-1])
 
