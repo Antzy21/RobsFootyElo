@@ -1,4 +1,4 @@
-from eloMath import eloCalculation
+from helpers.eloMath import eloCalculation
 
 class Team:
     def __init__(self, name) -> None:
@@ -38,5 +38,14 @@ class Season:
         self.number = number
         self.name = name
         self.games : list[Game] = []
+        self.homeWins = 0
+        self.awayWins = 0
+        self.draws = 0
     def addGame(self, game: Game):
         self.games.append(game)
+        if game.score[0] > game.score[1]:
+            self.homeWins += 1
+        elif game.score[0] < game.score[1]:
+            self.awayWins += 1
+        elif game.score[0] == game.score[1]:
+            self.draws += 1

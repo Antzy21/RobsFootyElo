@@ -1,4 +1,4 @@
-from classes import *
+from helpers.classes import *
 from datetime import datetime
 import csv
 
@@ -7,7 +7,7 @@ def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
     teams : dict[str, Team] = {}
     for i, seasonCsv in enumerate(csvs):
         season = Season(seasonCsv, i)
-        with open(seasonCsv, newline='') as csvfile:
+        with open(f"seasonCsvs/{seasonCsv}", newline='') as csvfile:
             csvReader = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(csvReader):
                 # Headers of csv, not data - so skip
