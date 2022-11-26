@@ -25,7 +25,7 @@ def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: in
             if elo is not None and elo < lowestElo:
                 lowestElo = elo
      
-def eloByDate(seasons : list[Season]):
+def eloByDate(seasons : list[Season]) -> dict[datetime, dict[str]]:
     dates : dict[datetime, dict[str]] = {}
     currentDate = None
     for season in seasons:
@@ -37,6 +37,20 @@ def eloByDate(seasons : list[Season]):
             dates[currentDate][game.away.name] = game.awayEloAfter
     
     return dates
+
+def eloByMatchWeek(seasons : list[Season]) -> dict[datetime, dict[str]]:
+    weeks : dict[str, dict[str]] = {}
+    for season in seasons:
+        for game in season.games:
+            week = f"{season.number}-{game.week}"
+            try:
+                weeks[week][game.home.name] = game.homeEloAfter
+                weeks[week][game.away.name] = game.awayEloAfter
+            except:
+                weeks[week] = {}
+                weeks[week][game.home.name] = game.homeEloAfter
+                weeks[week][game.away.name] = game.awayEloAfter
+    return weeks
      
 def winProbabilityByDate(seasons : list[Season], teams : dict[str, Team]):
     dates : dict[datetime, dict[str]] = {}
@@ -79,4 +93,5 @@ constructDateCsv("EloRatings", eloByDates, teams, printLine = False)
 winProbByDates = winProbabilityByDate(seasons, teams)
 constructDateCsv("Probabilities", winProbByDates, teams, printLine = False)
 
-constructGameCsv("EloRatingsByGame", seasons, teams)
+eloByMatchWeeks = eloByMatchWeek(seasons)
+constructGameCsv("EloRatingsByGame", eloByMatchWeeks, teams)

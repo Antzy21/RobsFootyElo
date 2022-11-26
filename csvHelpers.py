@@ -39,7 +39,7 @@ def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
 
 def constructGameCsv(
     outputFileName: str,
-    seasons: list[Season],
+    weekDict: dict[datetime, dict[str]],
     teams: list[Team],
     printLine: bool = False
     ):
@@ -50,18 +50,31 @@ def constructGameCsv(
         outputFile.write(line)
         if printLine:
             print(line)
-        for season in seasons:
-            for game in season.games:
-                line = f"{season.number}-{game.week}"
-                for team in teams:
-                    if team == game.home.name:
-                        line += f",{game.homeEloAfter}"
-                    elif team == game.away.name:
-                        line += f",{game.awayEloAfter}"
-                    else:
-                        line += ","
-                line += "\n"
-                outputFile.write(line)
+        # for season in seasons:
+        #     for game in season.games:
+        #         line = f"{season.number}-{game.week}"
+        #         for team in teams:
+        #             if team == game.home.name:
+        #                 line += f",{game.homeEloAfter}"
+        #             elif team == game.away.name:
+        #                 line += f",{game.awayEloAfter}"
+        #             else:
+        #                 line += ","
+        #         line += "\n"
+        #         outputFile.write(line)
+        for week in weekDict:
+            row = weekDict[week]
+            line = f"{week}"
+            for team in teams:
+                try:
+                    value = round(row[team], 1)
+                except:
+                    value = ""
+                line += f", {value}"
+            if printLine:
+                print(line)       
+            line += "\n"
+            outputFile.write(line)
 
 def constructDateCsv(
     outputFileName: str,
