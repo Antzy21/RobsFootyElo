@@ -42,7 +42,7 @@ def eloByMatchWeek(seasons : list[Season]) -> dict[datetime, dict[str]]:
     weeks : dict[str, dict[str]] = {}
     for season in seasons:
         for game in season.games:
-            week = f"{season.number}-{game.week}"
+            week = f"{season.number}~{game.week}"
             try:
                 weeks[week][game.home.name] = game.homeEloAfter
                 weeks[week][game.away.name] = game.awayEloAfter

@@ -46,7 +46,7 @@ def constructGameCsv(
     print(f"Writing to {outputFileName}.csv")
     
     with open(f'{outputFileName}.csv', "w") as outputFile:
-        line = 'Game Week, '+ ', '.join([team for team in teams])+'\n'
+        line = 'Game Week, '+ ','.join([team for team in teams])+'\n'
         outputFile.write(line)
         if printLine:
             print(line)
@@ -70,7 +70,7 @@ def constructGameCsv(
                     value = round(row[team], 1)
                 except:
                     value = ""
-                line += f", {value}"
+                line += f",{value}"
             if printLine:
                 print(line)       
             line += "\n"
@@ -101,7 +101,7 @@ def constructDateCsv(
                     value = round(row[team], 1)
                 except:
                     value = ""
-                line += f", {value}"
+                line += f",{value}"
             if printLine:
                 print(line)           
             line += "\n"
