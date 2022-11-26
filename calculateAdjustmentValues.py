@@ -37,24 +37,22 @@ def drawsFromAdjustmentValue(homeAdv, drawAdj):
     return 1/(1+exp(homeAdv-drawAdj)) - 1/(1+exp(homeAdv+drawAdj))
 
 def calcHomeAdvantage(homeAdv, drawAdj):
-    return 1-1/(exp(homeAdv+drawAdj))
+    return 1-1/(1+exp(homeAdv-drawAdj))
 
-drawProb = draws / draws+homeWins+awayWins
+drawProb = draws / total
 homeWinProb = homeWins / total
+print("\ndrawProb:",round(drawProb,3))
+print("homeWinProb:",round(homeWinProb,3),'\n')
 
-for B in range(0, 100):
-    b = B/100
-    for A in range(0, 100):
-        a = A/100
+for B in range(0, 1000):
+    b = B/1000
+    for A in range(0, 1000):
+        a = A/1000
         dProb = drawsFromAdjustmentValue(a,b)
         hwProb = calcHomeAdvantage(a,b)
-        if abs(dProb - drawProb) < 0.01:
-            if abs(hwProb - homeWinProb) < 0.1:
+        if abs(dProb - drawProb) < 0.0005:
+            if abs(hwProb - homeWinProb) < 0.0005:
                 print("a: ",a," - b:",b)
 
-print("drawProb: ", drawProb)
-drawAdj = 0.52
-
-
-
-print("homeWinProb: ", homeWinProb)
+drawAdj = 0.522
+homeAdvAdj = 0.0083
