@@ -41,13 +41,13 @@ def eloPrediction(
     homeElo,
     awayElo,
     powerBase = math.e,
-    homeAdvantage = 0.169,
-    footballSeasonalAdjustment = 0.252
+    homeAdvantage = 0.35,
+    drawAdjustment = 0.536
     ):
     
     eloDif = homeElo - awayElo
-    H = 1 - (1/(1+powerBase**(eloDif/400+homeAdvantage-footballSeasonalAdjustment)))
-    A = (1/(1+powerBase**(eloDif/400+homeAdvantage+footballSeasonalAdjustment)))
+    H = 1 - (1/(1+powerBase**(eloDif/400+homeAdvantage-drawAdjustment)))
+    A = (1/(1+powerBase**(eloDif/400+homeAdvantage+drawAdjustment)))
     D = 1 - (H + A)
     
     return (H, D, A)

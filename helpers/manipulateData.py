@@ -52,14 +52,14 @@ def logEvaluationForSeason(season : Season) -> tuple[dict[str, int], int]:
     weeks : dict[str, int] = {}
     total = 0
     for game in season.games:
-        week = f"{season.number}~{game.week}"
-        logValue = eloMath.logEvaluationValue(game.homeEloAfter, game.awayEloAfter, game.score)
-        total += logValue
-        try:
-            weeks[week] += logValue
-        except:
-            print(week, game.date)
-            weeks[week] = logValue
+        if game.week < 19:
+            week = f"{season.number}~{game.week}"
+            logValue = eloMath.logEvaluationValue(game.homeEloAfter, game.awayEloAfter, game.score)
+            total += logValue
+            try:
+                weeks[week] += logValue
+            except:
+                weeks[week] = logValue
     return weeks, total
      
 def winProbabilityByDate(seasons : list[Season], teams : dict[str, Team]):
