@@ -52,16 +52,18 @@ def eloByMatchWeek(seasons : list[Season]) -> dict[datetime, dict[str]]:
                 weeks[week][game.away.name] = game.awayEloAfter
     return weeks
 
-def logEvaluationForSeason(season : Season) -> dict[str, int]:
+def logEvaluationForSeason(season : Season) -> tuple[dict[str, int], int]:
     weeks : dict[str, int] = {}
+    total = 0
     for game in season.games:
         week = f"{season.number}~{game.week}"
         logValue = eloMath.logEvaluationValue(game.homeEloAfter, game.awayEloAfter, game.score)
+        total += logValue
         try:
             weeks[week] += logValue
         except:
             weeks[week] = logValue
-    return weeks
+    return weeks, total
      
 def winProbabilityByDate(seasons : list[Season], teams : dict[str, Team]):
     dates : dict[datetime, dict[str]] = {}
@@ -107,7 +109,9 @@ constructDateCsv("Probabilities", winProbByDates, teams, printLine = False)
 eloByMatchWeeks = eloByMatchWeek(seasons)
 constructGameCsv("EloRatingsByGame", eloByMatchWeeks, teams)
 
-logValues = logEvaluationForSeason(seasons[-1])
+logValues, logTotal = logEvaluationForSeason(seasons[-1])
 
 for logValue in logValues:
     print(logValue,": ",logValues[logValue])
+
+print(logTotal)
