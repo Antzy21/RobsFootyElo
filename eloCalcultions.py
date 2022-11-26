@@ -4,7 +4,7 @@ import time
 import helpers.eloMath
 from helpers.csvHelpers import *
 from helpers.classes import *
-from manipulateData import *
+from helpers.manipulateData import *
 
 def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: int) -> None:
     print("Running Calculations")
