@@ -45,7 +45,7 @@ def constructGameCsv(
     ):
     print(f"Writing to {outputFileName}.csv")
     
-    with open(f'{outputFileName}.csv', "w") as outputFile:
+    with open(f'outputCsvs/{outputFileName}.csv', "w") as outputFile:
         line = 'Game Week, '+ ','.join([team for team in teams])+'\n'
         outputFile.write(line)
         if printLine:
@@ -80,13 +80,13 @@ def constructDateCsv(
     outputFileName: str,
     datesDict: dict[datetime, dict[str]],
     teams: list[Team],
-    printLine: bool = True
+    printLine: bool = False
     ):
     # Now we have run all the data through the elo calculators
     # Time to print out our results to an output csv 
     print(f"Writing to {outputFileName}.csv")
     
-    with open(f'{outputFileName}.csv', "w") as outputFile:
+    with open(f'outputCsvs/{outputFileName}.csv', "w") as outputFile:
         # Print header - "Date" and all the team names
         line = 'Dates, '+ ', '.join([team for team in teams])+'\n'
         outputFile.write(line)

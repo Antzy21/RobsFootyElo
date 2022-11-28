@@ -1,2 +1,2 @@
-*.csv
+outputCsvs/*.csv
 *.pyc

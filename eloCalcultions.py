@@ -18,20 +18,24 @@ csvList = [
 
 startingElo = 1000
 print("Starting Elo:", startingElo)
+kWeight = 20
 
-for k in range(10, 30):
-    seasons, teams = readCsvs(csvList)
-    calculateElos(seasons, teams, startingElo, k)
+# for k in range(10, 30):
+#     seasons, teams = readCsvs(csvList)
+#     calculateElos(seasons, teams, startingElo, k)
 
-    logValues, logTotal = logEvaluationForSeason(seasons[-1])
-    #for logValue in logValues:
-        #print(logValue,": ",logValues[logValue])
-    print("k: ",k, "log: ",logTotal)
+#     logValues, logTotal = logEvaluationForSeason(seasons[-1])
+#     #for logValue in logValues:
+#         #print(logValue,": ",logValues[logValue])
+#     print("k: ",k, "log: ",logTotal)
 
-# constructDateCsv("EloRatings", eloByDate(seasons), teams)
-# constructDateCsv("Probabilities", winProbabilityByDate(seasons, teams), teams)
-# constructGameCsv("EloRatingsByGame", eloByMatchWeek(seasons), teams)
-# constructGameCsv("ProbabilitiesByGame", winProbByMatchWeek(seasons), teams)
-# constructGameCsv("LogEvalByGame", logEvalByMatchWeek([seasons[-1]], teams), teams)
-# constructGameCsv("GoalDifByGame", goalDifByMatchWeek([seasons[-1]], teams), teams)
+seasons, teams = readCsvs(csvList)
+calculateElos(seasons, teams, startingElo, kWeight)
+
+constructDateCsv("EloRatings", eloByDate(seasons), teams)
+constructDateCsv("Probabilities", winProbabilityByDate(seasons, teams), teams)
+constructGameCsv("EloRatingsByGame", eloByMatchWeek(seasons), teams)
+constructGameCsv("ProbabilitiesByGame", winProbByMatchWeek(seasons), teams)
+constructGameCsv("LogEvalByGame", logEvalByMatchWeek([seasons[-1]], teams), teams)
+constructGameCsv("GoalDifByGame", goalDifByMatchWeek([seasons[-1]], teams), teams)
 
