@@ -58,18 +58,6 @@ def constructGameCsv(
         outputFile.write(line)
         if printLine:
             print(line)
-        # for season in seasons:
-        #     for game in season.games:
-        #         line = f"{season.number}-{game.week}"
-        #         for team in teams:
-        #             if team == game.home.name:
-        #                 line += f",{game.homeEloAfter}"
-        #             elif team == game.away.name:
-        #                 line += f",{game.awayEloAfter}"
-        #             else:
-        #                 line += ","
-        #         line += "\n"
-        #         outputFile.write(line)
         for week in weekDict:
             row = weekDict[week]
             line = f"{week}"
@@ -117,7 +105,7 @@ def constructDateCsv(
     
 def constructBetCsv(
     outputFileName: str,
-    datesDict: dict[datetime, float],
+    seasons: list[Season],
     printLine: bool = False
     ):
     # Now we have run all the data through the elo calculators
@@ -125,16 +113,20 @@ def constructBetCsv(
     print(f"Writing to {outputFileName}.csv")
     
     with open(f'outputCsvs/{outputFileName}.csv', "w") as outputFile:
-        line = 'Bet Results'+'\n'
+        line = 'Season,Date,Home,Away,Score,Home Elo,Away Elo,Home Bet,Draw Bet,Away Bet,Home Win Prob,Draw Prob,Away Win Prob,Bet Results'+'\n'
         outputFile.write(line)
         if printLine:
             print(line)
         
-        for date in datesDict:
-            result = datesDict[date]
-            line = f"{result}"
-            if printLine:
-                print(line)           
-            line += "\n"
-            outputFile.write(line)            
+        for season in seasons:
+            for game in season.games:
+                line = f"{season.number}~{game.week},{game.date}"
+                line += f",{game.home.name},{game.away.name},{game.score[0]}-{game.score[1]}"
+                line += f",{game.homeEloBefore},{game.awayEloBefore}"
+                line += f",{game.bet.homeBet},{game.bet.drawBet},{game.bet.awayBet}"
+                line += f",{game.homeWinProb},{game.drawProb},{game.awayWinProb},{game.bet.result}"
+                if printLine:
+                    print(line)
+                line += "\n"
+                outputFile.write(line)
     

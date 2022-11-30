@@ -121,16 +121,3 @@ def winProbabilityByDate(seasons : list[Season], teams : dict[str, Team]):
             dates[currentDate][game.away.name] = A*100
     
     return dates
-
-def betResultByGame(seasons : list[Season]):
-    dates : dict[datetime, float] = {}
-    for season in seasons:
-        for game in season.games:
-            H, D, A = eloMath.eloPrediction(game.homeEloBefore, game.awayEloBefore)
-            if game.score[0] > game.score[1]:
-                dates[game.date] = game.bet.homeBet * H
-            elif game.score[0] < game.score[1]:
-                dates[game.date] = game.bet.awayBet * A
-            elif game.score[0] == game.score[1]:
-                dates[game.date] =  game.bet.drawBet * D
-    return dates

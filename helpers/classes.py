@@ -1,4 +1,4 @@
-from helpers.eloMath import eloCalculation
+from helpers.eloMath import *
 
 class Team:
     def __init__(self, name) -> None:
@@ -17,6 +17,13 @@ class Bet:
         self.homeBet = home
         self.drawBet = draw
         self.awayBet = away
+    def placeBet(self, H, D, A, score: tuple[int, int], size = 1):
+        if score[0] > score[1]:
+            self.result = self.homeBet * H
+        elif score[0] < score[1]:
+            self.result = self.awayBet * A
+        elif score[0] == score[1]:
+            self.result = self.drawBet * D
 
 class Game:
     def __init__(self, season, date, home, away, score, bet) -> None:
@@ -39,6 +46,11 @@ class Game:
                k = K
         except:
            k = K
+        H, D, A = eloPrediction(self.home.elo, self.away.elo)
+        self.homeWinProb = H
+        self.drawProb = D
+        self.awayWinProb = A
+        self.bet.placeBet(H, D, A, self.score)
         homeNew, awayNew = eloCalculation(self.home.elo, self.away.elo, self.score, k)
         self.home.updateElo(homeNew, self.season)
         self.away.updateElo(awayNew, self.season)
