@@ -25,7 +25,7 @@ class Game:
         self.home : Team = home
         self.away : Team = away
         self.score : tuple[int, int] = score
-        self.bet = bet
+        self.bet : Bet = bet
         self.homeEloBefore = None
         self.homeEloAfter = None
         self.awayEloBefore = None
