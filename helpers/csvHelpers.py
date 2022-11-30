@@ -19,11 +19,13 @@ def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
                 # Each row is a match - time to record it and caculate elo!
                 else:
                     # Record date
-                    year, month, day = row[2].split("-")
+                    day, month, year = row[1].split("/")
                     date = datetime(int(year), int(month), int(day))
                     # Get teams
-                    homeTeamName = row[4]
-                    awayTeamName = row[6]
+                    homeTeamName = row[2]
+                    awayTeamName = row[3]
+
+
                     
                     if homeTeamName not in teams:
                         teams[homeTeamName] = Team(homeTeamName)
@@ -31,8 +33,14 @@ def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
                         teams[awayTeamName] = Team(awayTeamName)
                         
                     # Gets the score as two numbers in a tuple, first is for team1's goal count, second for team 2's goal count 
-                    score = (int(row[5][0]), int(row[5][-1]))
-                    game = Game(seasonCsv, date, teams[homeTeamName], teams[awayTeamName], score)
+                    score = (int(row[4]), int(row[5]))
+
+                    HomeBet = float(row[54])
+                    Drawbet = float(row[56])
+                    AwayBet = float(row[58])
+                    bet = Bet(HomeBet, Drawbet, AwayBet)
+
+                    game = Game(seasonCsv, date, teams[homeTeamName], teams[awayTeamName], score, bet)
                     season.addGame(game)
         seasons.append(season)
     return (seasons, teams)

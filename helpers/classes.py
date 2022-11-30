@@ -12,13 +12,20 @@ class Team:
         except:
             self.matchesPlayed[season] = 0
 
+class Bet:
+    def __init__(self, home, draw, away):
+        self.homeBet = home
+        self.drawBet = draw
+        self.awayBet = away
+
 class Game:
-    def __init__(self, season, date, home, away, score) -> None:
+    def __init__(self, season, date, home, away, score, bet) -> None:
         self.season = season
         self.date = date
         self.home : Team = home
         self.away : Team = away
         self.score : tuple[int, int] = score
+        self.bet = bet
         self.homeEloBefore = None
         self.homeEloAfter = None
         self.awayEloBefore = None
