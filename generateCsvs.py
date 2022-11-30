@@ -30,4 +30,4 @@ constructGameCsv("EloRatingsByGame", eloByMatchWeek(seasons), teams)
 constructGameCsv("ProbabilitiesByGame", winProbByMatchWeek(seasons), teams)
 constructGameCsv("LogEvalByGame", logEvalByMatchWeek([seasons[-1]], teams), teams)
 constructGameCsv("GoalDifByGame", goalDifByMatchWeek([seasons[-1]], teams), teams)
-
+constructBetCsv("BettingResult", betResultByGame(seasons))

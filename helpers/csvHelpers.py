@@ -115,3 +115,26 @@ def constructDateCsv(
             line += "\n"
             outputFile.write(line)            
     
+def constructBetCsv(
+    outputFileName: str,
+    datesDict: dict[datetime, float],
+    printLine: bool = False
+    ):
+    # Now we have run all the data through the elo calculators
+    # Time to print out our results to an output csv 
+    print(f"Writing to {outputFileName}.csv")
+    
+    with open(f'outputCsvs/{outputFileName}.csv', "w") as outputFile:
+        line = 'Bet Results'+'\n'
+        outputFile.write(line)
+        if printLine:
+            print(line)
+        
+        for date in datesDict:
+            result = datesDict[date]
+            line = f"{result}"
+            if printLine:
+                print(line)           
+            line += "\n"
+            outputFile.write(line)            
+    
