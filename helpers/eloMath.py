@@ -36,6 +36,38 @@ def eloCalculation(
     
     return(t1_, t2_)
 
+def eloCalculationWithGoalDif(
+    t1,
+    t2,
+    result : tuple[int, int],
+    weightK = 20
+    ):
+    
+    # Step 1
+    T1 = 10 ** (t1/400)
+    T2 = 10 ** (t2/400)
+    # Step 2
+    E1 = T1/(T1+T2)
+    E2 = T2/(T1+T2)
+    # Step 3
+    if result[0] > result[1]:
+        # if team1 wins (scores more goals)
+        S1 = 1
+        S2 = 0
+    elif result[0] < result[1]:
+        # if team2 wins (scores more goals)
+        S1 = 0
+        S2 = 1
+    elif result[0] == result[1]:
+        # if draw (scores same amount of goals)
+        S1 = 1/2
+        S2 = 1/2
+    # Step 4
+    t1_ = round(t1 + weightK * (S1 - E1))
+    t2_ = round(t2 + weightK * (S2 - E2))
+    
+    return(t1_, t2_)
+
 
 def eloPrediction(
     homeElo,
