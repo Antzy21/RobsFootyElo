@@ -15,10 +15,10 @@ csvList = [
     "18_19.csv",
 ]
 
-startingElo = 1000
+startingElo = 2000
 print("Starting Elo:", startingElo)
 
-kWeight = 680
+kWeight = 20
 print("Weight K:", kWeight)
 
 csvDicts = csvsToDictionary(csvList)

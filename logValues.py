@@ -15,7 +15,7 @@ csvList = [
     "18_19.csv",
 ]
 
-startingElo = 1000
+startingElo = 2000
 print("Starting Elo:", startingElo)
 
 bestLog = -1000000
