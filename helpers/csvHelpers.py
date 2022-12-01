@@ -2,6 +2,23 @@ from helpers.classes import *
 from datetime import datetime
 import csv
 
+def csvsToDictionary(csvs: list[str]) -> list[list[dict[str, str]]]:
+    outputs : list[list[dict[str, str]]] = []
+    for i, seasonCsv in enumerate(csvs):
+        output : list[dict[str, str]] = []
+        with open(f"seasonCsvs/{seasonCsv}", newline='') as csvfile:
+            rowDict : dict[str, str] = {}
+            csvReader = csv.reader(csvfile, delimiter=',')
+            for i, row in enumerate(csvReader):
+                if i == 0:
+                    headers = row
+                else:
+                    for j, cell in enumerate(row):
+                        rowDict[headers[j]] = cell
+            output.append(rowDict)
+        outputs.append(output)
+    return outputs
+
 def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
     seasons : list[Season] = []
     teams : dict[str, Team] = {}
