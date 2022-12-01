@@ -61,5 +61,5 @@ for B in range(0, 1000):
             if abs(hwProb - homeWinProb) < 0.0005:
                 print("a: ",a," - b:",b)
 
-drawAdj = 0.522
-homeAdvAdj = 0.0083
+drawAdj = 0.504
+homeAdvAdj = 0.33

@@ -41,8 +41,8 @@ def eloPrediction(
     homeElo,
     awayElo,
     powerBase = math.e,
-    homeAdvantage = 0.35,
-    drawAdjustment = 0.536
+    homeAdvantage = 0.33,
+    drawAdjustment = 0.504
     ):
     
     eloDif = homeElo - awayElo
