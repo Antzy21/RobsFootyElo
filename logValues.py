@@ -12,10 +12,10 @@ csvList = [
     "15_16.csv",
     "16_17.csv",
     "17_18.csv",
-    "18_19.csv",
+    #"18_19.csv",
 ]
 
-startingElo = 2000
+startingElo = 1000
 print("Starting Elo:", startingElo)
 
 bestLog = -1000000
