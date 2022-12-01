@@ -44,17 +44,18 @@ def eloCalculationWithGoalDif(
     weightGd = 20,
     ):
 
-    t1, t2 = eloCalculation(t1, t2, result, weightK)
+    t1_, t2_ = eloCalculation(t1, t2, result, weightK)
 
     # Step 1
-    E1 = (T1-T2)/weightGd
-    E2 = (T2-T1)/weightGd
+    E1 = (t1-t2)/weightGd
+    E2 = (t2-t1)/weightGd
     # Step 2
     S1 = result[0]-result[1]
     S2 = result[1]-result[0]
-    # Step 4
-    t1_ = round(t1 + weightGd * (S1 - E1))
-    t2_ = round(t2 + weightGd * (S2 - E2))
+
+    # Add to exisiting elo changes
+    t1_ += round(weightGd * (S1 - E1))
+    t2_ += round(weightGd * (S2 - E2))
     
     return(t1_, t2_)
 
