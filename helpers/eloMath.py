@@ -16,7 +16,7 @@ def eloCalculation(
     T2 = 10 ** (t2/400)
     # Step 2
     E1 = T1/(T1+T2)
-    E2 = T1/(T1+T2)
+    E2 = T2/(T1+T2)
     # Step 3
     if result[0] > result[1]:
         # if team1 wins (scores more goals)
