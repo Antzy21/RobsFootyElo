@@ -2,46 +2,51 @@ from helpers.classes import *
 from datetime import datetime
 import csv
 
-def readCsvs(csvs: list[str]) -> tuple[list[Season], dict[str, Team]]:
-    seasons : list[Season] = []
-    teams : dict[str, Team] = {}
+def csvsToDictionary(csvs: list[str]) -> dict[list[dict[str, str]]]:
+    outputs : dict[list[dict[str, str]]] = {}
     for i, seasonCsv in enumerate(csvs):
-        season = Season(seasonCsv, i)
+        output : list[dict[str, str]] = []
         with open(f"seasonCsvs/{seasonCsv}", newline='') as csvfile:
             csvReader = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(csvReader):
-                # Headers of csv, not data - so skip
                 if i == 0:
-                    pass
-                # The data leaves rows blank inbetween days of matches, which is checked here - skip
-                elif ''.join(row) == '' :
-                    pass
-                # Each row is a match - time to record it and caculate elo!
+                    headers = row
                 else:
-                    # Record date
-                    day, month, year = row[1].split("/")
-                    date = datetime(int(year), int(month), int(day))
-                    # Get teams
-                    homeTeamName = row[2]
-                    awayTeamName = row[3]
+                    rowDict : dict[str, str] = {}
+                    for j, cell in enumerate(row):
+                        rowDict[headers[j]] = cell
+                    output.append(rowDict)
+        outputs[seasonCsv] = output
+    return outputs
 
+def buildSeasonsAndTeams(csvDicts: dict[list[dict[str, str]]]) -> tuple[list[Season], dict[str, Team]]:
+    seasons : list[Season] = []
+    teams : dict[str, Team] = {}
+    for i, seasonName in enumerate(csvDicts):
+        season = Season(seasonName, i)
+        for row in csvDicts[seasonName]:
+            # Record date
+            day, month, year = row['Date'].split("/")
+            date = datetime(int(year), int(month), int(day))
+            # Get teams
+            homeTeamName = row['HomeTeam']
+            awayTeamName = row['AwayTeam']
 
-                    
-                    if homeTeamName not in teams:
-                        teams[homeTeamName] = Team(homeTeamName)
-                    if awayTeamName not in teams:
-                        teams[awayTeamName] = Team(awayTeamName)
-                        
-                    # Gets the score as two numbers in a tuple, first is for team1's goal count, second for team 2's goal count 
-                    score = (int(row[4]), int(row[5]))
+            if homeTeamName not in teams:
+                teams[homeTeamName] = Team(homeTeamName)
+            if awayTeamName not in teams:
+                teams[awayTeamName] = Team(awayTeamName)
+                
+            # Gets the score as two numbers in a tuple, first is for team1's goal count, second for team 2's goal count 
+            score = (int(row['FTHG']), int(row['FTAG']))
 
-                    HomeBet = float(row[54])
-                    Drawbet = float(row[56])
-                    AwayBet = float(row[58])
-                    bet = Bet(HomeBet, Drawbet, AwayBet)
+            HomeBet = float(row['BbMxH'])
+            Drawbet = float(row['BbMxD'])
+            AwayBet = float(row['BbMxA'])
+            bet = Bet(HomeBet, Drawbet, AwayBet)
 
-                    game = Game(seasonCsv, date, teams[homeTeamName], teams[awayTeamName], score, bet)
-                    season.addGame(game)
+            game = Game(seasonName, date, teams[homeTeamName], teams[awayTeamName], score, bet)
+            season.addGame(game)
         seasons.append(season)
     return (seasons, teams)
 
