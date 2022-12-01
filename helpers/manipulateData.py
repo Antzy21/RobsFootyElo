@@ -2,7 +2,7 @@ from helpers.classes import *
 from datetime import datetime
 from helpers import eloMath
 
-def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: int, kWeight = 20) -> None:
+def calculateElos(seasons: list[Season], teams: dict[str, Team], startingElo: int, kWeight = 540) -> None:
     #print("Running Calculations")
     lowestElo = startingElo
     for season in seasons:
