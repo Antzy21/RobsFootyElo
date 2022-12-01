@@ -23,9 +23,8 @@ print("Starting Elo:", startingElo)
 kWeight = 540
 print("Weight K:", kWeight)
 
-csvDicts = csvsToDictionary(csvList)
-seasons, teams = buildSeasonsAndTeams(csvDicts)
-calculateElos(seasons, teams, startingElo, kWeight)
+csvDicts = readCsvs(csvList)
+seasons, teams = runCalculations(csvDicts, startingElo, kWeight)
 
 homeWins = 0
 awayWins = 0

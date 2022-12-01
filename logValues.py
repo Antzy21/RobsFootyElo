@@ -20,16 +20,15 @@ print("Starting Elo:", startingElo)
 
 bestLog = -1000000
 
-for k in range(0,1000,10):
-    csvDicts = csvsToDictionary(csvList)
-    seasons, teams = buildSeasonsAndTeams(csvDicts)
-    calculateElos(seasons, teams, startingElo, k)
+for k in range(0,1000,50):
+    csvDicts = readCsvs(csvList)
+    seasons, teams = runCalculations(csvDicts, startingElo, k)
 
     logValues, logTotal = logEvaluationForSeason(seasons[-1])
     for logValue in logValues:
         pass#print(logValue,": ",logValues[logValue])
     
-    #print("Weight K:", k, " - Log total: ", logTotal)
+    print("Weight K:", k, " - Log total: ", logTotal)
     if logTotal > bestLog:
         bestLog = logTotal
         optimumK = k

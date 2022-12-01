@@ -1,9 +1,9 @@
 from helpers.eloMath import *
 
 class Team:
-    def __init__(self, name) -> None:
-        self.name = name
-        self.elo = None
+    def __init__(self, name, initialElo) -> None:
+        self.name: str = name
+        self.elo: int = initialElo
         self.matchesPlayed: dict[int, int] = {}
     def updateElo(self, elo, season):
         self.elo = elo
@@ -17,7 +17,7 @@ class Bet:
         self.homeBet = home
         self.drawBet = draw
         self.awayBet = away
-    def placeBet(self, H, D, A, score: tuple[int, int], size = 1):
+    def betResult(self, H, D, A, score: tuple[int, int], size = 1):
         if score[0] > score[1]:
             self.result = self.homeBet * H
         elif score[0] < score[1]:
@@ -25,37 +25,48 @@ class Bet:
         elif score[0] == score[1]:
             self.result = self.drawBet * D
 
+class Probabilities:
+    def __init__(self, home, draw, away):
+        self.homeWin = home
+        self.draw = draw
+        self.awayWin = away
+
 class Game:
-    def __init__(self, season, date, home, away, score, bet) -> None:
+    def __init__(self, season, date, home, away, bet) -> None:
         self.season = season
         self.date = date
         self.home : Team = home
         self.away : Team = away
-        self.score : tuple[int, int] = score
+        self.score : tuple[int, int] = None
         self.bet : Bet = bet
+        self.probs: Probabilities = None
         self.homeEloBefore = None
         self.homeEloAfter = None
         self.awayEloBefore = None
         self.awayEloAfter = None
-    def playMatch(self, K = 540):
-        self.homeEloBefore = self.home.elo
-        self.awayEloBefore = self.away.elo
+    def setElos(self, score, k):
+        homeNew, awayNew = eloCalculation(self.home.elo, self.away.elo, score, k)
+        self.home.updateElo(homeNew, self.season)
+        self.away.updateElo(awayNew, self.season)
+        self.homeEloAfter = homeNew
+        self.awayEloAfter = awayNew
+    def playMatch(self, score, K = 540):
         k = 540
         try:
            if self.home.matchesPlayed[self.season] < 5:
                k = K
         except:
            k = K
-        H, D, A = eloPrediction(self.home.elo, self.away.elo)
-        self.homeWinProb = H
-        self.drawProb = D
-        self.awayWinProb = A
-        self.bet.placeBet(H, D, A, self.score)
-        homeNew, awayNew = eloCalculation(self.home.elo, self.away.elo, self.score, k)
-        self.home.updateElo(homeNew, self.season)
-        self.away.updateElo(awayNew, self.season)
-        self.homeEloAfter = homeNew
-        self.awayEloAfter = awayNew
+        
+        self.homeEloBefore = self.home.elo
+        self.awayEloBefore = self.away.elo
+        
+        H, D, A = eloPrediction(self.homeEloBefore, self.homeEloBefore)
+        self.probs: Probabilities = Probabilities(H, D, A)
+        self.bet.betResult(H, D, A, score)
+
+        self.score = score
+        self.setElos(score, k)
         self.week = self.home.matchesPlayed[self.season]
 
 class Season:
