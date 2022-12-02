@@ -2,7 +2,7 @@ from helpers.classes import *
 from datetime import datetime
 import csv
 
-def csvsToDictionary(csvs: list[str]) -> dict[list[dict[str, str]]]:
+def readCsvs(csvs: list[str]) -> dict[list[dict[str, str]]]:
     outputs : dict[list[dict[str, str]]] = {}
     for i, seasonCsv in enumerate(csvs):
         output : list[dict[str, str]] = []
@@ -19,9 +19,14 @@ def csvsToDictionary(csvs: list[str]) -> dict[list[dict[str, str]]]:
         outputs[seasonCsv] = output
     return outputs
 
-def buildSeasonsAndTeams(csvDicts: dict[list[dict[str, str]]]) -> tuple[list[Season], dict[str, Team]]:
+def runCalculations(
+    csvDicts: dict[list[dict[str, str]]],
+    startingElo: int = 1000,
+    kWeight = 20
+    ) -> tuple[list[Season], dict[str, Team]]:
     seasons : list[Season] = []
     teams : dict[str, Team] = {}
+    lowestElo = startingElo
     for i, seasonName in enumerate(csvDicts):
         season = Season(seasonName, i)
         for row in csvDicts[seasonName]:
@@ -33,11 +38,10 @@ def buildSeasonsAndTeams(csvDicts: dict[list[dict[str, str]]]) -> tuple[list[Sea
             awayTeamName = row['AwayTeam']
 
             if homeTeamName not in teams:
-                teams[homeTeamName] = Team(homeTeamName)
+                teams[homeTeamName] = Team(homeTeamName, lowestElo)
             if awayTeamName not in teams:
-                teams[awayTeamName] = Team(awayTeamName)
+                teams[awayTeamName] = Team(awayTeamName, lowestElo)
                 
-            # Gets the score as two numbers in a tuple, first is for team1's goal count, second for team 2's goal count 
             score = (int(row['FTHG']), int(row['FTAG']))
 
             HomeBet = float(row['BbMxH'])
@@ -45,9 +49,11 @@ def buildSeasonsAndTeams(csvDicts: dict[list[dict[str, str]]]) -> tuple[list[Sea
             AwayBet = float(row['BbMxA'])
             bet = Bet(HomeBet, Drawbet, AwayBet)
 
-            game = Game(seasonName, date, teams[homeTeamName], teams[awayTeamName], score, bet)
+            game = Game(seasonName, date, teams[homeTeamName], teams[awayTeamName], bet)
+            game.playMatch(score, kWeight)
             season.addGame(game)
         seasons.append(season)
+        lowestElo = min([teams[team].elo for team in teams])
     return (seasons, teams)
 
 def constructGameCsv(
@@ -129,7 +135,7 @@ def constructBetCsv(
                 line += f",{game.home.name},{game.away.name},{game.score[0]}-{game.score[1]}"
                 line += f",{game.homeEloBefore},{game.awayEloBefore}"
                 line += f",{game.bet.homeBet},{game.bet.drawBet},{game.bet.awayBet}"
-                line += f",{game.homeWinProb},{game.drawProb},{game.awayWinProb},{game.bet.result}"
+                line += f",{game.probs.homeWin},{game.probs.draw},{game.probs.awayWin},{game.bet.result}"
                 if printLine:
                     print(line)
                 line += "\n"

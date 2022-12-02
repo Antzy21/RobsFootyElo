@@ -46,9 +46,11 @@ def eloCalculationWithGoalDif(
 
     t1_, t2_ = eloCalculation(t1, t2, result, weightK)
 
+    c = 200
+
     # Step 1
-    E1 = (t1-t2)/weightGd
-    E2 = (t2-t1)/weightGd
+    E1 = (t1-t2)/c
+    E2 = (t2-t1)/c
     # Step 2
     S1 = result[0]-result[1]
     S2 = result[1]-result[0]
