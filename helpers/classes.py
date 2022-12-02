@@ -37,10 +37,10 @@ class Game:
         self.homeEloAfter = None
         self.awayEloBefore = None
         self.awayEloAfter = None
-    def playMatch(self, K = 540):
+    def playMatch(self, K = 40):
         self.homeEloBefore = self.home.elo
         self.awayEloBefore = self.away.elo
-        k = 540
+        k = 40
         try:
            if self.home.matchesPlayed[self.season] < 5:
                k = K
