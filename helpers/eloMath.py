@@ -8,7 +8,7 @@ def eloCalculation(
     t1,
     t2,
     result : tuple[int, int],
-    weightK = 40
+    weightK = 680
     ):
     
     # Step 1
@@ -40,8 +40,8 @@ def eloCalculationWithGoalDif(
     t1,
     t2,
     result : tuple[int, int],
-    weightK = 40,
-    weightGd = 40,
+    weightK = 680,
+    weightGd = 680,
     ):
 
     t1_, t2_ = eloCalculation(t1, t2, result, weightK)

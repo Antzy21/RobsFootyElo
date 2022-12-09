@@ -22,7 +22,7 @@ def readCsvs(csvs: list[str]) -> dict[list[dict[str, str]]]:
 def runCalculations(
     csvDicts: dict[list[dict[str, str]]],
     startingElo: int = 1000,
-    kWeight = 20
+    kWeight = 680
     ) -> tuple[list[Season], dict[str, Team]]:
     seasons : list[Season] = []
     teams : dict[str, Team] = {}
