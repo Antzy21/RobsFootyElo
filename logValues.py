@@ -12,7 +12,7 @@ csvList = [
     "15_16.csv",
     "16_17.csv",
     "17_18.csv",
-    #"18_19.csv",
+    "18_19.csv",
 ]
 
 startingElo = 1000
