@@ -65,7 +65,7 @@ class Game:
         self.homeEloBefore = self.home.elo
         self.awayEloBefore = self.away.elo
         
-        H, D, A = eloPrediction(self.homeEloBefore, self.homeEloBefore)
+        H, D, A = eloPrediction(self.homeEloBefore, self.awayEloBefore)
         self.probs: Probabilities = Probabilities(H, D, A)
         self.bet.betResult(H, D, A, score)
 
