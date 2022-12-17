@@ -6,60 +6,42 @@ from helpers.classes import *
 from helpers.manipulateData import *
 from math import exp
 
+def calculateadjustment(seasons):
 
-csvList = [
-    "12_13.csv",
-    "13_14.csv",
-    "14_15.csv",
-    "15_16.csv",
-    "16_17.csv",
-    "17_18.csv",
-    #"18_19.csv",
-]
+    homeWins = 0
+    awayWins = 0
+    draws = 0
+    for season in seasons:
+        homeWins += season.homeWins
+        awayWins += season.awayWins
+        draws += season.draws
+    total = homeWins+awayWins+draws
 
-startingElo = 1000
-print("Starting Elo:", startingElo)
+    print("homeWins: ",homeWins)
+    print("awayWins: ",awayWins)
+    print("draws: ",draws)
+    print("total: ",total)
 
-kWeight = 40
-print("Weight K:", kWeight)
+    def drawsFromAdjustmentValue(homeAdv, drawAdj):
+        return 1/(1+exp(homeAdv-drawAdj)) - 1/(1+exp(homeAdv+drawAdj))
 
-csvDicts = readCsvs(csvList)
-seasons, teams = runCalculations(csvDicts, startingElo, kWeight)
+    def calcHomeAdvantage(homeAdv, drawAdj):
+        return 1-1/(1+exp(homeAdv-drawAdj))
 
-homeWins = 0
-awayWins = 0
-draws = 0
-for season in seasons:
-    homeWins += season.homeWins
-    awayWins += season.awayWins
-    draws += season.draws
-total = homeWins+awayWins+draws
+    drawProb = draws / total
+    homeWinProb = homeWins / total
+    print("\ndrawProb:",round(drawProb,3))
+    print("homeWinProb:",round(homeWinProb,3),'\n')
 
-print("homeWins: ",homeWins)
-print("awayWins: ",awayWins)
-print("draws: ",draws)
-print("total: ",total)
+    for B in range(0, 1000):
+        b = B/1000
+        for A in range(0, 1000):
+            a = A/1000
+            dProb = drawsFromAdjustmentValue(a,b)
+            hwProb = calcHomeAdvantage(a,b)
+            if abs(dProb - drawProb) < 0.0005:
+                if abs(hwProb - homeWinProb) < 0.0005:
+                    print("a: ",a," - b:",b)
 
-def drawsFromAdjustmentValue(homeAdv, drawAdj):
-    return 1/(1+exp(homeAdv-drawAdj)) - 1/(1+exp(homeAdv+drawAdj))
-
-def calcHomeAdvantage(homeAdv, drawAdj):
-    return 1-1/(1+exp(homeAdv-drawAdj))
-
-drawProb = draws / total
-homeWinProb = homeWins / total
-print("\ndrawProb:",round(drawProb,3))
-print("homeWinProb:",round(homeWinProb,3),'\n')
-
-for B in range(0, 1000):
-    b = B/1000
-    for A in range(0, 1000):
-        a = A/1000
-        dProb = drawsFromAdjustmentValue(a,b)
-        hwProb = calcHomeAdvantage(a,b)
-        if abs(dProb - drawProb) < 0.0005:
-            if abs(hwProb - homeWinProb) < 0.0005:
-                print("a: ",a," - b:",b)
-
-drawAdj = 0.504
-homeAdvAdj = 0.33
+    drawAdj = 0.504
+    homeAdvAdj = 0.33

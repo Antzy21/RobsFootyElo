@@ -1,4 +1,5 @@
 from helpers.eloMath import *
+from helpers.kellyBetting import kellyformula
 
 class Team:
     def __init__(self, name, initialElo) -> None:
@@ -24,6 +25,11 @@ class Bet:
             self.result = self.awayBet * A
         elif score[0] == score[1]:
             self.result = self.drawBet * D
+    def betKelly(self, H, D, A, score: tuple[int, int]):
+        self.homekelly = kellyformula(self.homeBet,H)
+        self.drawkelly = kellyformula(self.drawBet,D)
+        self.awaykelly = kellyformula(self.awayBet,A)
+
 
 class Probabilities:
     def __init__(self, home, draw, away):
@@ -44,23 +50,20 @@ class Game:
         self.homeEloAfter = None
         self.awayEloBefore = None
         self.awayEloAfter = None
-    def playMatch(self, K = 680):
-        self.homeEloBefore = self.home.elo
-        self.awayEloBefore = self.away.elo
-        k = 680
     def setElos(self, score, k):
         homeNew, awayNew = eloCalculation(self.home.elo, self.away.elo, score, k)
         self.home.updateElo(homeNew, self.season)
         self.away.updateElo(awayNew, self.season)
         self.homeEloAfter = homeNew
         self.awayEloAfter = awayNew
-    def playMatch(self, score, K = 680):
-        k = 680
-        try:
-           if self.home.matchesPlayed[self.season] < 5:
-               k = K
-        except:
-           k = K
+    def playMatch(self, score, k = 32, capital = 100, overrideEarlyGamesK = False):
+        if overrideEarlyGamesK:
+            earlyGameK = 680
+            try:
+                if self.home.matchesPlayed[self.season] < 5:
+                    k = earlyGameK
+            except:
+                k = earlyGameK
         
         self.homeEloBefore = self.home.elo
         self.awayEloBefore = self.away.elo
@@ -68,10 +71,11 @@ class Game:
         H, D, A = eloPrediction(self.homeEloBefore, self.awayEloBefore)
         self.probs: Probabilities = Probabilities(H, D, A)
         self.bet.betResult(H, D, A, score)
+        self.bet.betKelly(H, D, A, score)
 
         self.score = score
         self.setElos(score, k)
-        self.week = self.home.matchesPlayed[self.season]
+        self.week = self.home.matchesPlayed[self.season] + 1
 
 class Season:
     def __init__(self, name, number) -> None:
