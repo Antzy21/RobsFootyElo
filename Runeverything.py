@@ -19,7 +19,7 @@ capital = 1000
 for season in seasons:
     capital = season.playMatches(kWeight, defaultElo=lowestElo, capital=capital, betAfterDate=datetime(2018,6,1))
     lowestElo = getLowestElo(teams)
-    input(f"Next Season: {season.name}")
+    #input(f"Next Season: {season.name}")
 
 runallcsvs(seasons,teams)
 
