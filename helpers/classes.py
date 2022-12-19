@@ -44,19 +44,19 @@ class Bet:
             self.homeBetResult = -self.homeKellyBetSize
             if result == "H":
                 self.homeBetResult += self.homeKellyBetSize*self.homeOdds
-            self.netChange += self.homeKellyBetSize
+            self.netChange += self.homeBetResult
         if self.drawkelly > 0:
             self.drawKellyBetSize = capital*self.drawkelly
             self.drawBetResult = -self.drawKellyBetSize
             if result == "D":
                 self.drawBetResult += self.drawKellyBetSize*self.drawOdds
-            self.netChange += self.drawKellyBetSize
+            self.netChange += self.drawBetResult
         if self.awaykelly > 0:
             self.awayKellyBetSize = capital*self.awaykelly
             self.awayBetResult = -self.awayKellyBetSize
             if result == "A":
                 self.awayBetResult += self.awayKellyBetSize*self.awayOdds
-            self.netChange += self.awayKellyBetSize
+            self.netChange += self.awayBetResult
         capital = capital + self.netChange
         self.postBetCapital = capital
         return capital
