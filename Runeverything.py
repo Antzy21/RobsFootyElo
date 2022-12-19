@@ -1,6 +1,8 @@
 from helpers.csvHelpers import readCsvs, parseSeasonsAndTeams
+from helpers.manipulateData import getLowestElo
 from generateCsvs import runallcsvs
-from Evaluation import logscore
+from datetime import datetime
+from Evaluation import printLogScore
 from calculateAdjustmentValues import calculateadjustment
 
 startingElo = 1000
@@ -13,14 +15,14 @@ csvDicts = readCsvs()
 seasons, teams = parseSeasonsAndTeams(csvDicts)
 
 lowestElo = startingElo
+capital = 1000
 for season in seasons:
-    season.run(startingElo=lowestElo)
-    eloList = [teams[team].elo for team in teams if (teams[team].elo is not None)]
-    eloList.sort()
-    lowestElo = eloList[0]
+    capital = season.playMatches(kWeight, defaultElo=lowestElo, capital=capital, betAfterDate=datetime(2018,6,1))
+    lowestElo = getLowestElo(teams)
+    input(f"Next Season: {season.name}")
 
 runallcsvs(seasons,teams)
 
-logscore(seasons,kWeight)
+#printLogScore(seasons)
 
-calculateadjustment(seasons)
+#calculateadjustment(seasons)

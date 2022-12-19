@@ -26,7 +26,8 @@ class Bet:
         self.drawkelly = kellyformula(self.drawOdds,DrawProbability)
         self.awaykelly = kellyformula(self.awayOdds,AwayWinProbability)
 
-    def placeKellyBets(self, result: str, capital):
+    def placeKellyBets(self, result: str, capital: int):
+        self.preBetCapital = capital
         if self.homekelly > 0:
             self.kellyBetSize = capital*self.homekelly
             capital -= self.kellyBetSize
@@ -42,6 +43,7 @@ class Bet:
             capital -= self.kellyBetSize
             if result == "A":
                 capital += self.kellyBetSize*self.awayOdds
+        self.postBetCapital = capital
         return capital
 
 
@@ -73,6 +75,9 @@ class Game:
             self.result = "D"
         self.bet: Bet = bet
 
+    def getSeasonWeekName(self):
+        return f"{self.season.number}~{self.week+1}"
+
     def setElos(self, homeGoals, awayGoals, k):
         self.homeEloBefore = self.home.elo
         self.awayEloBefore = self.away.elo
@@ -82,27 +87,23 @@ class Game:
         self.homeEloAfter = homeNew
         self.awayEloAfter = awayNew
 
-    def playMatch(self, k = 32, capital = 100, defaultElo = 1000, overrideEarlyGamesK = False):
-        if overrideEarlyGamesK:
-            earlyGameK = 32
+    def playMatch(self, kWeight, overrideEarlyGamesK = None):
+        if overrideEarlyGamesK is not None:
             try:
                 if self.home.matchesPlayed[self.season] < 5:
-                    k = earlyGameK
+                    kWeight = overrideEarlyGamesK
             except:
-                k = earlyGameK
-        
-        if self.home.elo is None:
-            self.home.elo = defaultElo
-        if self.away.elo is None:
-            self.away.elo = defaultElo
+                kWeight = overrideEarlyGamesK
+        self.setElos(self.homeGoals, self.awayGoals, kWeight)
+        self.week = self.home.matchesPlayed[self.season] + 1
 
+    def makePredictionsForGame(self, defaultElo = 1000):
         homeWinProb, drawProb, awayWinProb = eloPrediction(self.home.elo, self.away.elo)
         self.probabilities = Probabilities(homeWinProb, drawProb, awayWinProb)
         self.bet.calculateKellyValues(homeWinProb, drawProb, awayWinProb)
 
-        self.setElos(self.homeGoals, self.awayGoals, k)
-        self.week = self.home.matchesPlayed[self.season] + 1
-
+    def betOnGame(self, capital: int):
+        return self.bet.placeKellyBets(self.result, capital)
 
 class Season:
     def __init__(self, name, number) -> None:
@@ -123,6 +124,15 @@ class Season:
         elif game.homeGoals == game.awayGoals:
             self.draws += 1
     
-    def run(self, startingElo = 1000):
+    def playMatches(self, kWeight, defaultElo = 1000, capital = 1000, betAfterDate: datetime = datetime(1950,1,1)):
         for game in self.games:
-            game.playMatch(defaultElo= startingElo)
+            if game.home.elo is None:
+                game.home.elo = defaultElo
+            if game.away.elo is None:
+                game.away.elo = defaultElo
+            game.makePredictionsForGame()
+            game.playMatch(kWeight = kWeight)
+            if game.date > betAfterDate:
+                print("capital:", capital)
+                capital = game.betOnGame(capital)
+        return capital
