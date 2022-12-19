@@ -111,8 +111,10 @@ def constructGamesCsv(
     print(f"Writing to {outputFileName}.csv")
     
     with open(f'outputCsvs/{outputFileName}.csv', "w") as outputFile:
-        line = "Season,Date,Home,Away"
-        line += ",Score,Result,Home Elo,Away Elo"
+        line = "Season,Date"
+        line += ",Home,Away"
+        line += ",Score,Result"
+        line += ",Home Elo,Away Elo"
         line += ",Home Odds,Draw Odds,Away Odds"
         line += ",Home Win Prob,Draw Prob,Away Win Prob"
         line += ",Bet Home,Bet Draw,Bet Away"
@@ -124,8 +126,9 @@ def constructGamesCsv(
         
         for season in seasons:
             for game in season.games:
-                line = f"{season.number}~{game.week},{game.date}"
-                line += f",{game.home.name},{game.away.name},{game.homeGoals}:{game.awayGoals}"
+                line = f"{game.getSeasonWeekName()},{game.date}"
+                line += f",{game.home.name},{game.away.name}"
+                line += f",{game.homeGoals}:{game.awayGoals},{game.result}"
                 line += f",{game.homeEloBefore},{game.awayEloBefore}"
                 line += f",{game.bet.homeOdds},{game.bet.drawOdds},{game.bet.awayOdds}"
                 line += f",{game.probabilities.homeWin},{game.probabilities.draw},{game.probabilities.awayWin}"
