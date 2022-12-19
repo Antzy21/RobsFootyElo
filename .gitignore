@@ -1,2 +1,3 @@
 outputCsvs/*.csv
 *.pyc
+/.vs
