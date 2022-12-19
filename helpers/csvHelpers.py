@@ -117,6 +117,7 @@ def constructGamesCsv(
         line += ",Home Win Prob,Draw Prob,Away Win Prob"
         line += ",Bet Home,Bet Draw,Bet Away"
         line += ",Bet Size Home,Bet Size Draw,Bet Size Away"
+        line += ",Net Change"
         outputFile.write(line+"\n")
         if printLine:
             print(line)
@@ -130,6 +131,7 @@ def constructGamesCsv(
                 line += f",{game.probabilities.homeWin},{game.probabilities.draw},{game.probabilities.awayWin}"
                 line += f",{game.bet.homekelly},{game.bet.drawkelly},{game.bet.awaykelly}"
                 line += f",{game.bet.homeKellyBetSize},{game.bet.drawKellyBetSize},{game.bet.awayKellyBetSize}"
+                line += f",{game.bet.netChange}"
                 if printLine:
                     print(line)
                 line += "\n"

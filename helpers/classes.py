@@ -45,6 +45,7 @@ class Bet:
             if result == "A":
                 capital += self.kellyBetSize*self.awayOdds
         self.postBetCapital = capital
+        self.netChange = self.preBetCapital - self.postBetCapital
         return capital
 
 
