@@ -1,5 +1,6 @@
 from helpers.classes import *
 from datetime import datetime
+from dateutil.parser import parse
 import csv
 from pathlib import PurePath, Path
 
@@ -34,66 +35,64 @@ def tryGetCell(names: list[str], row):
     except:
         return tryGetCell(names[1:], row)
 
-def runCalculations(
+def parseGame(row, teams):
+    date = parse(row['Date'])
+    homeTeamName = row['HomeTeam']
+    awayTeamName = row['AwayTeam']
+
+    if homeTeamName not in teams:
+        teams[homeTeamName] = Team(homeTeamName)
+    if awayTeamName not in teams:
+        teams[awayTeamName] = Team(awayTeamName)
+        
+    homeGoals = int(row['FTHG'])
+    awayGoals = int(row['FTAG'])
+
+    try:
+        v = tryGetCell(['BbMxH', 'MaxH'], row)
+        HomeBet = float(v)
+    except:
+        HomeBet = 1
+        # print(f"Err: {season.name} - {date.date()} - {homeTeamName} vs {awayTeamName} - no max home bet")
+    try:
+        v = tryGetCell(['BbMxD', 'MaxD'], row)
+        Drawbet = float(v)
+    except:
+        Drawbet = 1
+        # print(f"Err: {season.name} - {date.date()} - {homeTeamName} vs {awayTeamName} - no max draw bet column")
+    try:
+        v = tryGetCell(['BbMxA', 'MaxA'], row)
+        AwayBet = float(v)
+    except:
+        AwayBet = 1
+        # print(f"Err: {season.name} - {date.date()} - {homeTeamName} vs {awayTeamName} - no max away bet column")
+
+    bet = Bet(HomeBet, Drawbet, AwayBet)
+
+    return Game(
+        date,
+        teams[homeTeamName],
+        teams[awayTeamName],
+        homeGoals,
+        awayGoals,
+        bet)
+
+def parseSeasonsAndTeams(
     csvDicts: dict[list[dict[str, str]]],
-    startingElo: int = 1000,
-    kWeight = 32,
-    capital = 100
     ) -> tuple[list[Season], dict[str, Team]]:
     seasons : list[Season] = []
     teams : dict[str, Team] = {}
-    lowestElo = startingElo
     for i, seasonName in enumerate(csvDicts):
         season = Season(seasonName, i)
         for row in csvDicts[seasonName]:
-            # Record date
-            day, month, year = row['Date'].split("/")
-            date = datetime(int(year), int(month), int(day))
-            # Get teams
-            homeTeamName = row['HomeTeam']
-            awayTeamName = row['AwayTeam']
-
-            if homeTeamName not in teams:
-                teams[homeTeamName] = Team(homeTeamName, lowestElo)
-            if awayTeamName not in teams:
-                teams[awayTeamName] = Team(awayTeamName, lowestElo)
-                
-            score = (int(row['FTHG']), int(row['FTAG']))
-
-            try:
-                v = tryGetCell(['BbMxH', 'MaxH'], row)
-                HomeBet = float(v)
-            except:
-                HomeBet = 1
-                print(f"Err: {season.name} - {date.date()} - {homeTeamName} vs {awayTeamName} - no max home bet")
-            try:
-                v = tryGetCell(['BbMxD', 'MaxD'], row)
-                Drawbet = float(v)
-            except:
-                Drawbet = 1
-                print(f"Err: {season.name} - {date.date()} - {homeTeamName} vs {awayTeamName} - no max draw bet column")
-            try:
-                v = tryGetCell(['BbMxA', 'MaxA'], row)
-                AwayBet = float(v)
-            except:
-                AwayBet = 1
-                print(f"Err: {season.name} - {date.date()} - {homeTeamName} vs {awayTeamName} - no max away bet column")
-
-            bet = Bet(HomeBet, Drawbet, AwayBet)
-
-            game = Game(seasonName, date, teams[homeTeamName], teams[awayTeamName], bet)
-            game.playMatch(score, kWeight)
-
-            capital = game.bet.placeKellyBets(capital)
-            game.capital = capital
+            game = parseGame(row, teams)
             season.addGame(game)
         seasons.append(season)
-        lowestElo = min([teams[team].elo for team in teams])
     return (seasons, teams)
 
-def constructGameCsv(
+def constructTeamCsv(
     outputFileName: str,
-    weekDict: dict[datetime, dict[str]],
+    dict: dict[datetime, dict[str]],
     teams: list[Team],
     printLine: bool = False
     ):
@@ -104,9 +103,10 @@ def constructGameCsv(
         outputFile.write(line)
         if printLine:
             print(line)
-        for week in weekDict:
-            row = weekDict[week]
-            line = f"{week}"
+            
+        for key in dict:
+            row = dict[key]
+            line = f"{key}"
             for team in teams:
                 try:
                     value = round(row[team], 1)
@@ -118,38 +118,7 @@ def constructGameCsv(
             line += "\n"
             outputFile.write(line)
 
-def constructDateCsv(
-    outputFileName: str,
-    datesDict: dict[datetime, dict[str]],
-    teams: list[Team],
-    printLine: bool = False
-    ):
-    # Now we have run all the data through the elo calculators
-    # Time to print out our results to an output csv 
-    print(f"Writing to {outputFileName}.csv")
-    
-    with open(f'outputCsvs/{outputFileName}.csv', "w") as outputFile:
-        # Print header - "Date" and all the team names
-        line = 'Dates, '+ ', '.join([team for team in teams])+'\n'
-        outputFile.write(line)
-        if printLine:
-            print(line)
-        
-        for date in datesDict:
-            row = datesDict[date]
-            line = f"{date}"
-            for team in teams:
-                try:
-                    value = round(row[team], 1)
-                except:
-                    value = ""
-                line += f",{value}"
-            if printLine:
-                print(line)           
-            line += "\n"
-            outputFile.write(line)            
-    
-def constructBetCsv(
+def constructGamesCsv(
     outputFileName: str,
     seasons: list[Season],
     printLine: bool = False

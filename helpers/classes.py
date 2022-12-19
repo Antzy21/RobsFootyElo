@@ -1,10 +1,10 @@
 from helpers.eloMath import *
 from helpers.kellyBetting import kellyformula
+from datetime import datetime
 
 class Team:
-    def __init__(self, name, initialElo) -> None:
+    def __init__(self, name) -> None:
         self.name: str = name
-        self.elo: int = initialElo
         self.matchesPlayed: dict[int, int] = {}
     def updateElo(self, elo, season):
         self.elo = elo
@@ -54,13 +54,19 @@ class Probabilities:
         self.awayWin = away
 
 class Game:
-    def __init__(self, season, date, home, away, bet) -> None:
-        self.season = season
-        self.date = date
-        self.home : Team = home
-        self.away : Team = away
-        self.score : tuple[int, int] = None
-        self.bet : Bet = bet
+    def __init__(self,
+        date: datetime,
+        home: Team,
+        away: Team,
+        homeGoals,
+        awayGoals: int,
+        bet: Bet) -> None:
+        self.date: datetime = date
+        self.home: Team = home
+        self.away: Team = away
+        self.homeGoals: int = homeGoals
+        self.awayGoals: int = awayGoals
+        self.bet: Bet = bet
         self.probs: Probabilities = None
         self.homeEloBefore = None
         self.homeEloAfter = None
@@ -109,6 +115,7 @@ class Season:
         self.awayWins = 0
         self.draws = 0
     def addGame(self, game: Game):
+        game.season = self
         self.games.append(game)
         if game.score[0] > game.score[1]:
             self.homeWins += 1
