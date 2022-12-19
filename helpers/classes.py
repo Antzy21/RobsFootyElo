@@ -15,6 +15,7 @@ class Team:
         except:
             self.matchesPlayed[season] = 0
 
+
 class Bet:
     def __init__(self, homeOdds, drawOdds, awayOdds):
         self.homeOdds = homeOdds
@@ -29,18 +30,18 @@ class Bet:
     def placeKellyBets(self, result: str, capital: int):
         self.preBetCapital = capital
         if self.homekelly > 0:
-            self.kellyBetSize = capital*self.homekelly
-            capital -= self.kellyBetSize
+            self.homeKellyBetSize = capital*self.homekelly
+            capital -= self.homeKellyBetSize
             if result == "H":
                 capital += self.kellyBetSize*self.homeOdds
         if self.drawkelly > 0:
-            self.kellyBetSize = capital*self.drawkelly
-            capital -= self.kellyBetSize
+            self.drawKellyBetSize = capital*self.drawkelly
+            capital -= self.drawKellyBetSize
             if result == "D":
                 capital += self.kellyBetSize*self.drawOdds
         if self.awaykelly > 0:
-            self.kellyBetSize = capital*self.awaykelly
-            capital -= self.kellyBetSize
+            self.awayKellyBetSize = capital*self.awaykelly
+            capital -= self.awayKellyBetSize
             if result == "A":
                 capital += self.kellyBetSize*self.awayOdds
         self.postBetCapital = capital
@@ -104,6 +105,7 @@ class Game:
 
     def betOnGame(self, capital: int):
         return self.bet.placeKellyBets(self.result, capital)
+
 
 class Season:
     def __init__(self, name, number) -> None:
