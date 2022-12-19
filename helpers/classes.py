@@ -27,6 +27,9 @@ class Bet:
         self.netChange = None
         self.postBetCapital = None
         self.preBetCapital = None
+        self.homeBetResult = None
+        self.drawBetResult = None
+        self.awayBetResult = None
 
     def calculateKellyValues(self, HomeWinProbability, DrawProbability, AwayWinProbability):
         self.homekelly = kellyformula(self.homeOdds,HomeWinProbability)
@@ -38,19 +41,22 @@ class Bet:
         self.netChange = 0
         if self.homekelly > 0:
             self.homeKellyBetSize = capital*self.homekelly
-            capital -= self.homeKellyBetSize
+            self.homeBetResult = -self.homeKellyBetSize
             if result == "H":
-                self.netChange += self.homeKellyBetSize*self.homeOdds
+                self.homeBetResult += self.homeKellyBetSize*self.homeOdds
+            self.netChange += self.homeKellyBetSize
         if self.drawkelly > 0:
             self.drawKellyBetSize = capital*self.drawkelly
-            capital -= self.drawKellyBetSize
+            self.drawBetResult = -self.drawKellyBetSize
             if result == "D":
-                self.netChange += self.drawKellyBetSize*self.drawOdds
+                self.drawBetResult += self.drawKellyBetSize*self.drawOdds
+            self.netChange += self.drawKellyBetSize
         if self.awaykelly > 0:
             self.awayKellyBetSize = capital*self.awaykelly
-            capital -= self.awayKellyBetSize
+            self.awayBetResult = -self.awayKellyBetSize
             if result == "A":
-                self.netChange += self.awayKellyBetSize*self.awayOdds
+                self.awayBetResult += self.awayKellyBetSize*self.awayOdds
+            self.netChange += self.awayKellyBetSize
         capital = capital + self.netChange
         self.postBetCapital = capital
         return capital
