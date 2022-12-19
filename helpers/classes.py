@@ -50,7 +50,7 @@ class Bet:
                 self.netChange = self.awayKellyBetSize*self.awayOdds
         capital = capital + self.netChange
         self.postBetCapital = capital
-        return capital
+        return self.capital
 
 
 class Probabilities:
