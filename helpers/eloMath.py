@@ -8,7 +8,7 @@ def eloCalculation(
     t1,
     t2,
     result : tuple[int, int],
-    weightK = 680
+    weightK = 32
     ):
     
     # Step 1
@@ -66,8 +66,8 @@ def eloPrediction(
     homeElo,
     awayElo,
     powerBase = math.e,
-    homeAdvantage = 0.315,
-    drawAdjustment = 0.563
+    homeAdvantage = 0.362,
+    drawAdjustment = 0.526
     ):
     
     eloDif = homeElo - awayElo

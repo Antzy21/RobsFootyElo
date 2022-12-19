@@ -7,22 +7,23 @@ def readCsvs() -> dict[list[dict[str, str]]]:
     outputs : dict[list[dict[str, str]]] = {}
     path = PurePath()
     path = path.parent.joinpath("seasonCsvs")
-    for leaguePath in Path(path).iterdir():
-        for seasonCsvPath in Path(leaguePath).iterdir():
-            output : list[dict[str, str]] = []
-            with Path(seasonCsvPath).open() as csvfile:
-                csvReader = csv.reader(csvfile, delimiter=',')
-                for i, row in enumerate(csvReader):
-                    if i == 0:
-                        headers = row
-                    else:
-                        rowDict : dict[str, str] = {}
-                        for j, cell in enumerate(row):
-                            rowDict[headers[j]] = cell
-                        output.append(rowDict)
-            outputs[seasonCsvPath] = output
-            path.parent
+    #for leaguePath in Path(path).iterdir():
+    leaguePath = path.joinpath("PremierLeague")
+    for seasonCsvPath in Path(leaguePath).iterdir():
+        output : list[dict[str, str]] = []
+        with Path(seasonCsvPath).open() as csvfile:
+            csvReader = csv.reader(csvfile, delimiter=',')
+            for i, row in enumerate(csvReader):
+                if i == 0:
+                    headers = row
+                else:
+                    rowDict : dict[str, str] = {}
+                    for j, cell in enumerate(row):
+                        rowDict[headers[j]] = cell
+                    output.append(rowDict)
+        outputs[seasonCsvPath] = output
         path.parent
+        #path.parent
     return outputs
 
 def tryGetCell(names: list[str], row):
@@ -36,7 +37,8 @@ def tryGetCell(names: list[str], row):
 def runCalculations(
     csvDicts: dict[list[dict[str, str]]],
     startingElo: int = 1000,
-    kWeight = 32
+    kWeight = 32,
+    capital = 100
     ) -> tuple[list[Season], dict[str, Team]]:
     seasons : list[Season] = []
     teams : dict[str, Team] = {}
@@ -82,6 +84,8 @@ def runCalculations(
             game = Game(seasonName, date, teams[homeTeamName], teams[awayTeamName], bet)
             game.playMatch(score, kWeight)
 
+            capital = game.bet.placeKellyBets(capital)
+            game.capital = capital
             season.addGame(game)
         seasons.append(season)
         lowestElo = min([teams[team].elo for team in teams])
@@ -165,7 +169,7 @@ def constructBetCsv(
                 line = f"{season.number}~{game.week},{game.date}"
                 line += f",{game.home.name},{game.away.name},{game.score[0]}-{game.score[1]}"
                 line += f",{game.homeEloBefore},{game.awayEloBefore}"
-                line += f",{game.bet.homeBet},{game.bet.drawBet},{game.bet.awayBet}"
+                line += f",{game.bet.homeOdds},{game.bet.drawOdds},{game.bet.awayOdds}"
                 line += f",{game.probs.homeWin},{game.probs.draw},{game.probs.awayWin},{game.bet.result}"
                 if printLine:
                     print(line)
@@ -182,7 +186,7 @@ def constructkellybetcsv(
     print(f"Writing to {outputFileName}.csv")
     
     with open(f'outputCsvs/{outputFileName}.csv', "w") as outputFile:
-        line = 'Season,Date,Home,Away,Score,Home Elo,Away Elo,Home Bet,Draw Bet,Away Bet,Home Win Prob,Draw Prob,Away Win Prob,Bet home,Bet draw,Bet away'+'\n'
+        line = 'Season,Date,Home,Away,Score,Result,Home Elo,Away Elo,Home Bet,Draw Bet,Away Bet,Home Win Prob,Draw Prob,Away Win Prob,Bet home,Bet draw,Bet away'+'\n'
         outputFile.write(line)
         if printLine:
             print(line)
@@ -190,10 +194,12 @@ def constructkellybetcsv(
         for season in seasons:
             for game in season.games:
                 line = f"{season.number}~{game.week},{game.date}"
-                line += f",{game.home.name},{game.away.name},{game.score[0]}-{game.score[1]}"
+                line += f",{game.home.name},{game.away.name}"
+                line += f",{game.score[0]} - {game.score[1]},{game.result}"
                 line += f",{game.homeEloBefore},{game.awayEloBefore}"
-                line += f",{game.bet.homeBet},{game.bet.drawBet},{game.bet.awayBet}"
-                line += f",{game.probs.homeWin},{game.probs.draw},{game.probs.awayWin},{game.bet.homekelly},{game.bet.drawkelly},{game.bet.awaykelly}"
+                line += f",{game.bet.homeOdds},{game.bet.drawOdds},{game.bet.awayOdds}"
+                line += f",{game.probs.homeWin},{game.probs.draw},{game.probs.awayWin}"
+                line += f",{game.bet.homekelly},{game.bet.drawkelly},{game.bet.awaykelly}"
                 if printLine:
                     print(line)
                 line += "\n"

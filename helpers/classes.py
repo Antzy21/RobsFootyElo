@@ -14,22 +14,38 @@ class Team:
             self.matchesPlayed[season] = 0
 
 class Bet:
-    def __init__(self, home, draw, away):
-        self.homeBet = home
-        self.drawBet = draw
-        self.awayBet = away
-    def betResult(self, H, D, A, score: tuple[int, int], size = 1):
+    def __init__(self, homeOdds, drawOdds, awayOdds):
+        self.homeOdds = homeOdds
+        self.drawOdds = drawOdds
+        self.awayOdds = awayOdds
+    def betResult(self, HomeWinProbability, DrawProbability, AwayWinProbability, score: tuple[int, int], size = 1):
         if score[0] > score[1]:
-            self.result = self.homeBet * H
+            self.result = self.homeOdds * HomeWinProbability
         elif score[0] < score[1]:
-            self.result = self.awayBet * A
+            self.result = self.awayOdds * AwayWinProbability
         elif score[0] == score[1]:
-            self.result = self.drawBet * D
-    def betKelly(self, H, D, A, score: tuple[int, int]):
-        self.homekelly = kellyformula(self.homeBet,H)
-        self.drawkelly = kellyformula(self.drawBet,D)
-        self.awaykelly = kellyformula(self.awayBet,A)
-
+            self.result = self.drawOdds * DrawProbability
+    def betKelly(self, HomeWinProbability, DrawProbability, AwayWinProbability):
+        self.homekelly = kellyformula(self.homeOdds,HomeWinProbability)
+        self.drawkelly = kellyformula(self.drawOdds,DrawProbability)
+        self.awaykelly = kellyformula(self.awayOdds,AwayWinProbability)
+    def placeKellyBets(self, result: str, capital):
+        if self.homekelly > 0:
+            self.kellyBetSize = capital*self.homekelly
+            capital -= self.kellyBetSize
+            if result == "H":
+                capital += self.kellyBetSize*self.homeOdds
+        if self.drawkelly > 0:
+            self.kellyBetSize = capital*self.drawkelly
+            capital -= self.kellyBetSize
+            if result == "D":
+                capital += self.kellyBetSize*self.drawOdds
+        if self.awaykelly > 0:
+            self.kellyBetSize = capital*self.awaykelly
+            capital -= self.kellyBetSize
+            if result == "A":
+                capital += self.kellyBetSize*self.awayOdds
+        return capital
 
 class Probabilities:
     def __init__(self, home, draw, away):
@@ -58,7 +74,7 @@ class Game:
         self.awayEloAfter = awayNew
     def playMatch(self, score, k = 32, capital = 100, overrideEarlyGamesK = False):
         if overrideEarlyGamesK:
-            earlyGameK = 680
+            earlyGameK = 32
             try:
                 if self.home.matchesPlayed[self.season] < 5:
                     k = earlyGameK
@@ -74,6 +90,13 @@ class Game:
         self.bet.betKelly(H, D, A, score)
 
         self.score = score
+        if score[0] > score[1]:
+            self.result = "H"
+        elif score[0] < score [1]:
+            self.result = "A"
+        elif score[0] == score[1]:
+            self.result = "D"
+
         self.setElos(score, k)
         self.week = self.home.matchesPlayed[self.season] + 1
 
