@@ -51,7 +51,7 @@ def logEvaluationForSeason(season : Season) -> tuple[dict[str, int], int]:
     for game in season.games:
         if game.week < 19:
             week = f"{season.number}~{game.week}"
-            logValue = eloMath.logEvaluationValue(game.homeEloAfter, game.awayEloAfter, game.score)
+            logValue = eloMath.logEvaluationValue(game.homeEloAfter, game.awayEloAfter, game.result)
             total += logValue
             try:
                 weeks[week] += logValue
@@ -64,7 +64,7 @@ def logEvalByMatchWeek(seasons : list[Season], teams : dict[str, Team]) -> dict[
     for season in seasons:
         for game in season.games:
             week = f"{season.number}~{game.week}"
-            logValue = eloMath.logEvaluationValue(game.homeEloAfter, game.awayEloAfter, game.score)
+            logValue = eloMath.logEvaluationValue(game.homeEloAfter, game.awayEloAfter, game.result)
             try:
                 weeks[week][game.home.name] = logValue
                 weeks[week][game.away.name] = logValue
@@ -79,7 +79,7 @@ def goalDifByMatchWeek(seasons : list[Season], teams : dict[str, Team]) -> dict[
     for season in seasons:
         for game in season.games:
             week = f"{season.number}~{game.week}"
-            value = game.score[0]-game.score[1]
+            value = game.homeGoals-game.awayGoals
             try:
                 weeks[week][game.home.name] = value
                 weeks[week][game.away.name] = -value

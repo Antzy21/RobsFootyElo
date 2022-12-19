@@ -1,6 +1,4 @@
-from helpers.csvHelpers import *
-from helpers.classes import *
-from helpers.manipulateData import *
+from helpers.csvHelpers import readCsvs, parseSeasonsAndTeams
 from generateCsvs import runallcsvs
 from Evaluation import logscore
 from calculateAdjustmentValues import calculateadjustment
@@ -12,7 +10,14 @@ kWeight = 32
 print("Weight K:", kWeight)
 
 csvDicts = readCsvs()
-seasons, teams = runCalculations(csvDicts, startingElo, kWeight)
+seasons, teams = parseSeasonsAndTeams(csvDicts)
+
+lowestElo = startingElo
+for season in seasons:
+    season.run(startingElo=lowestElo)
+    eloList = [teams[team].elo for team in teams if (teams[team].elo is not None)]
+    eloList.sort()
+    lowestElo = eloList[0]
 
 runallcsvs(seasons,teams)
 

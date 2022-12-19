@@ -7,7 +7,8 @@ import math
 def eloCalculation(
     t1,
     t2,
-    result : tuple[int, int],
+    homeGoals,
+    awayGoals,
     weightK = 32
     ):
     
@@ -18,15 +19,15 @@ def eloCalculation(
     E1 = T1/(T1+T2)
     E2 = T2/(T1+T2)
     # Step 3
-    if result[0] > result[1]:
+    if homeGoals > awayGoals:
         # if team1 wins (scores more goals)
         S1 = 1
         S2 = 0
-    elif result[0] < result[1]:
+    elif homeGoals < awayGoals:
         # if team2 wins (scores more goals)
         S1 = 0
         S2 = 1
-    elif result[0] == result[1]:
+    elif homeGoals == awayGoals:
         # if draw (scores same amount of goals)
         S1 = 1/2
         S2 = 1/2
@@ -39,12 +40,13 @@ def eloCalculation(
 def eloCalculationWithGoalDif(
     t1,
     t2,
-    result : tuple[int, int],
+    homeGoals,
+    awayGoals,
     weightK = 680,
     weightGd = 680,
     ):
 
-    t1_, t2_ = eloCalculation(t1, t2, result, weightK)
+    t1_, t2_ = eloCalculation(t1, t2, homeGoals, awayGoals, weightK)
 
     c = 200
 
@@ -52,12 +54,11 @@ def eloCalculationWithGoalDif(
     E1 = (t1-t2)/c
     E2 = (t2-t1)/c
     # Step 2
-    S1 = result[0]-result[1]
-    S2 = result[1]-result[0]
+    goalDifference = homeGoals-awayGoals
 
     # Add to exisiting elo changes
-    t1_ += round(weightGd * (S1 - E1))
-    t2_ += round(weightGd * (S2 - E2))
+    t1_ += round(weightGd * (goalDifference - E1))
+    t2_ += round(weightGd * (-goalDifference - E2))
     
     return(t1_, t2_)
 
@@ -77,11 +78,11 @@ def eloPrediction(
     
     return (H, D, A)
 
-def logEvaluationValue(homeElo, awayElo, matchResult: tuple[int, int]) -> int:
+def logEvaluationValue(homeElo, awayElo, matchResult) -> int:
     (H, D, A) = eloPrediction(homeElo, awayElo)
-    if matchResult[0] > matchResult[1]:
+    if matchResult == "H":
         return math.log(H)
-    elif matchResult[0] < matchResult[1]:
+    elif matchResult == "A":
         return math.log(A)
-    elif matchResult[0] == matchResult[1]:
+    elif matchResult == "D":
         return math.log(D)
