@@ -21,15 +21,15 @@ class Bet:
         self.homeOdds = homeOdds
         self.drawOdds = drawOdds
         self.awayOdds = awayOdds
-        self.homeKellyBetSize = None
-        self.drawKellyBetSize = None
-        self.awayKellyBetSize = None
-        self.netChange = None
-        self.postBetCapital = None
-        self.preBetCapital = None
-        self.homeBetResult = None
-        self.drawBetResult = None
-        self.awayBetResult = None
+        self.homeKellyBetSize = 0
+        self.drawKellyBetSize = 0
+        self.awayKellyBetSize = 0
+        self.netChange = 0
+        self.postBetCapital = 0
+        self.preBetCapital = 0
+        self.homeBetResult = 0
+        self.drawBetResult = 0
+        self.awayBetResult = 0
 
     def calculateKellyValues(self, HomeWinProbability, DrawProbability, AwayWinProbability):
         self.homekelly = kellyformula(self.homeOdds,HomeWinProbability)

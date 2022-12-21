@@ -15,9 +15,9 @@ csvDicts = readCsvs()
 seasons, teams = parseSeasonsAndTeams(csvDicts)
 
 lowestElo = startingElo
-capital = 1000
+capital = 10
 for season in seasons:
-    capital = season.playMatches(kWeight, defaultElo=lowestElo, capital=capital, betAfterDate=datetime(2018,6,1))
+    capital = season.playMatches(kWeight, defaultElo=lowestElo, capital=capital, betAfterDate=datetime(2016,6,1))
     lowestElo = getLowestElo(teams)
     #input(f"Next Season: {season.name}")
 
