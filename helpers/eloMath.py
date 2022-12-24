@@ -42,8 +42,8 @@ def eloCalculationWithGoalDif(
     t2,
     homeGoals,
     awayGoals,
-    weightK = 680,
-    weightGd = 680,
+    weightK = 32,
+    weightGd = 32,
     ):
 
     t1_, t2_ = eloCalculation(t1, t2, homeGoals, awayGoals, weightK)
