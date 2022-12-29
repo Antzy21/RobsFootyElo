@@ -1,6 +1,7 @@
 from helpers.csvHelpers import *
 from helpers.classes import Season
 from helpers.manipulateData import *
+from helpers.eloMath import meanSquaredErrorForGame
 
 def logEvaluationForSeason(season : Season) -> tuple[dict[str, int], int]:
     weeks : dict[str, int] = {}
@@ -22,3 +23,10 @@ def printLogScore(seasons: list[Season]):
     for key in logValues:
         print(f"S~W: {key} - Log: {round(logValues[key], 3)}")
 
+def meanSquaredError(seasons: list[Season]):
+    total = 0
+    for season in seasons:
+        for game in season.games:
+            result = meanSquaredErrorForGame(game)
+            total += result
+    return total

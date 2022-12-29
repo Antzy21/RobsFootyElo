@@ -37,6 +37,29 @@ def eloCalculation(
     
     return(t1_, t2_)
 
+def meanSquaredErrorForGame(game):
+
+    # Step 1
+    T1 = 10 ** (game.homeEloBefore/400)
+    T2 = 10 ** (game.awayEloBefore/400)
+    # Step 2
+    expectedHome = T1/(T1+T2)
+    expectedAway = T2/(T1+T2)
+    # Step 3
+    if game.homeGoals > game.awayGoals:
+        # if team1 wins (scores more goals)
+        observedHome = 1
+        observedAway = 0
+    elif game.homeGoals < game.awayGoals:
+        # if team2 wins (scores more goals)
+        observedHome = 0
+        observedAway = 1
+    elif game.homeGoals == game.awayGoals:
+        # if draw (scores same amount of goals)
+        observedHome = 1/2
+        observedAway = 1/2
+    return ((expectedHome-observedHome)**2+(expectedAway-observedAway)**2)
+
 def eloCalculationWithGoalDif(
     t1,
     t2,

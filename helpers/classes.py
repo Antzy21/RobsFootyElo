@@ -149,6 +149,6 @@ class Season:
             game.makePredictionsForGame()
             game.playMatch(kWeight = kWeight)
             if game.date > betAfterDate:
-                print("capital:", capital)
+                #print("capital:", capital)
                 capital = game.betOnGame(capital)
         return capital

@@ -4,4 +4,4 @@ def kellyformula(bet: int, prob: int) -> int:
     result = ((bet*prob)-1)/(bet-1)
     return(result)
 
-#print(kellyformula(2.12,0.7551))
+print(kellyformula(49/20,0.38))
