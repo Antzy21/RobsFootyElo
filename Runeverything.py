@@ -22,14 +22,14 @@ def run(k):
         capital = season.playMatches(k, defaultElo=lowestElo, capital=capital, betAfterDate=datetime(2005,6,1))
         lowestElo = getLowestElo(teams)
         input(f"Next Season: {season.name}")
-    return seasons
+    return seasons,teams
 for k in range(1,20,2):
-    seasons = run(k)
+    seasons,teams = run(k)
     M = meanSquaredError(seasons)
     print(k, M)
 
 
-#runallcsvs(seasons,teams)
+runallcsvs(seasons,teams)
 #printLogScore(seasons)
 
 M = meanSquaredError(seasons)
